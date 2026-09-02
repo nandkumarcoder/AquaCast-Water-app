@@ -3,225 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AquaCast 💧 | Water & Weather Forecast + Hydration Companion</title>
-  
-  <!-- Tailwind CSS -->
+  <title>AquaCast | Water Forecast & Hydration Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  
-
-  <!-- Google Fonts & FontAwesome -->
+  <script>tailwind.config={theme:{extend:{colors:{brand:{50:'#f0f9ff',400:'#38bdf8',500:'#0ea5e9',600:'#0284c7',900:'#0c4a6e'}}}}}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
-  <!-- Chart.js & Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
-  <!-- Custom Styles -->
-  
-<style>
-/* AquaCast Custom Glassmorphic & Fluid Theme */
-:root {
-  --primary-blue: #0284c7;
-  --aqua-glow: #38bdf8;
-  --bg-gradient: linear-gradient(135deg, #0f172a 0%, #0369a1 50%, #0c4a6e 100%);
-  --glass-bg: rgba(15, 23, 42, 0.65);
-  --glass-border: rgba(255, 255, 255, 0.12);
-  --water-cyan: #06b6d4;
-  --water-blue: #0284c7;
-}
-
-body {
-  background: var(--bg-gradient);
-  background-attachment: fixed;
-  color: #f8fafc;
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  min-height: 100vh;
-}
-
-/* Glass Card */
-.glass-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
-  border-radius: 1.25rem;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.glass-card-interactive:hover {
-  border-color: rgba(56, 189, 248, 0.3);
-  transform: translateY(-2px);
-  box-shadow: 0 15px 30px -5px rgba(2, 132, 199, 0.2);
-}
-
-/* Animated Water Container & Wave */
-.water-tank-container {
-  position: relative;
-  width: 200px;
-  height: 280px;
-  margin: 0 auto;
-  border-radius: 2rem 2rem 3rem 3rem;
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: inset 0 0 20px rgba(6, 182, 212, 0.3), 0 10px 25px rgba(0,0,0,0.4);
-  overflow: hidden;
-}
-
-.water-tank-inner {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 0%;
-  background: linear-gradient(180deg, #38bdf8 0%, #0284c7 60%, #0369a1 100%);
-  transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.water-wave {
-  position: absolute;
-  top: -24px;
-  left: -50%;
-  width: 200%;
-  height: 30px;
-  background-image: radial-gradient(circle at 50% 100%, transparent 60%, #38bdf8 61%);
-  background-size: 40px 30px;
-  animation: waveMove 3s linear infinite;
-  opacity: 0.8;
-}
-
-@keyframes waveMove {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(50%); }
-}
-
-/* Glass Buttons */
-.btn-water {
-  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-  border: 1px solid rgba(56, 189, 248, 0.4);
-  color: white;
-  transition: all 0.2s ease;
-}
-
-.btn-water:hover {
-  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-  box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
-  transform: translateY(-1px);
-}
-
-.btn-water:active {
-  transform: translateY(1px);
-}
-
-.btn-quick-add {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  transition: all 0.2s ease;
-}
-
-.btn-quick-add:hover {
-  background: rgba(56, 189, 248, 0.2);
-  border-color: rgba(56, 189, 248, 0.5);
-  transform: scale(1.05);
-}
-
-/* Rain droplet animation */
-.droplet-pulse {
-  animation: dropletPulse 2s infinite ease-in-out;
-}
-
-@keyframes dropletPulse {
-  0%, 100% { transform: scale(1); opacity: 0.9; }
-  50% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 8px #38bdf8); }
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(56, 189, 248, 0.4);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(56, 189, 248, 0.7);
-}
-</style>
+  <style>
+    :root{--glass-bg:rgba(15,23,42,0.85);--glass-border:rgba(255,255,255,0.15);}
+    *{box-sizing:border-box;}
+    body{background-color:#0f172a;background-image:linear-gradient(135deg,#0f172a 0%,#0369a1 50%,#0c4a6e 100%);background-attachment:fixed;min-height:100vh;color:#f8fafc;font-family:'Inter',system-ui,sans-serif;}
+    .glass-card{background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:1.25rem;box-shadow:0 10px 25px -5px rgba(0,0,0,0.4);}
+    .glass-card-interactive:hover{border-color:rgba(56,189,248,0.4);transform:translateY(-2px);transition:all 0.2s ease;}
+    .btn-water{background:linear-gradient(135deg,#0284c7,#0369a1);border:1px solid rgba(56,189,248,0.3);color:#fff;cursor:pointer;transition:all 0.2s;}
+    .btn-water:hover{background:linear-gradient(135deg,#0ea5e9,#0284c7);box-shadow:0 0 15px rgba(56,189,248,0.4);}
+    .btn-quick-add{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:all 0.2s;border-radius:1rem;}
+    .btn-quick-add:hover{background:rgba(56,189,248,0.18);border-color:rgba(56,189,248,0.45);}
+    .water-tank-container{position:relative;width:180px;height:260px;margin:0 auto;border-radius:2rem 2rem 3rem 3rem;border:3px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.04);overflow:hidden;}
+    .water-tank-inner{position:absolute;bottom:0;left:0;width:100%;height:0%;background:linear-gradient(180deg,#38bdf8 0%,#0284c7 60%,#0369a1 100%);transition:height 0.8s cubic-bezier(0.4,0,0.2,1);}
+    .water-wave{position:absolute;top:-20px;left:-50%;width:200%;height:28px;background-image:radial-gradient(circle at 50% 100%,transparent 60%,#38bdf8 61%);background-size:36px 28px;animation:waveMove 2.5s linear infinite;opacity:0.8;}
+    @keyframes waveMove{0%{transform:translateX(0);}100%{transform:translateX(50%);}}
+    ::-webkit-scrollbar{width:5px;height:5px;}
+    ::-webkit-scrollbar-track{background:rgba(15,23,42,0.5);}
+    ::-webkit-scrollbar-thumb{background:rgba(56,189,248,0.4);border-radius:4px;}
+    .nav-tab{cursor:pointer;transition:all 0.2s ease;}
+    .tab-content{display:none;}
+    .tab-content.active{display:block;}
+  </style>
 </head>
-<body class="antialiased text-slate-100 flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen">
 
-  <!-- Top Navigation / Header -->
-  <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-white/10 px-4 py-3">
-    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-      
-      <!-- Brand Logo -->
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-sky-500/30">
-          <i class="fa-solid fa-droplet text-white text-xl droplet-pulse"></i>
-        </div>
-        <div>
-          <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-sky-200 to-cyan-300 bg-clip-text text-transparent">AquaCast</h1>
-          <p class="text-xs text-sky-300/80 font-medium">Water Forecast & Hydration Hub</p>
-        </div>
+  <!-- HEADER -->
+  <header class="sticky top-0 z-30 bg-slate-950/80 backdrop-blur-lg border-b border-white/10 px-4 py-3">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
+      <div class="flex items-center gap-2.5 shrink-0">
+        <div class="w-8 h-8 rounded-xl bg-sky-500 flex items-center justify-center shadow-lg"><i class="fa-solid fa-droplet text-white text-sm"></i></div>
+        <div><p class="text-base font-extrabold text-white leading-none">AquaCast</p><p class="text-[10px] text-sky-400 font-medium">Water Forecast & Hydration Hub</p></div>
       </div>
-
-      <!-- Search & Geolocation Bar -->
-      <div class="relative w-full sm:w-80 flex items-center">
-        <div class="relative w-full">
-          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-          <input 
-            type="text" 
-            id="cityInput" 
-            placeholder="Search city (e.g. New York, London, Delhi)..." 
-            class="w-full pl-10 pr-10 py-2 bg-slate-800/80 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-500/20 transition-all shadow-inner"
-            autocomplete="off"
-          >
-          <button id="clearSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
-            <i class="fa-solid fa-xmark text-xs"></i>
-          </button>
-          
-          <!-- Auto-complete Dropdown -->
-          <div id="searchResults" class="hidden absolute left-0 right-0 top-full mt-2 bg-slate-900/95 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50 max-h-60 overflow-y-auto">
-            <!-- Dynamic search results populated here -->
-          </div>
-        </div>
-
-        <!-- Geo Button -->
-        <button id="geoBtn" title="Use current location" class="ml-2 p-2 bg-slate-800/80 hover:bg-sky-600/30 border border-slate-700 hover:border-sky-500/50 rounded-xl text-sky-400 transition-all shadow-sm">
-          <i class="fa-solid fa-location-crosshairs text-base"></i>
-        </button>
+      <div class="relative flex-grow max-w-xs">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+        <input id="cityInput" type="text" placeholder="Search city (e.g. New York, Delhi...)" class="w-full pl-8 pr-8 py-2 bg-slate-800/70 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30">
+        <button id="clearSearchBtn" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white hidden"><i class="fa-solid fa-xmark text-xs"></i></button>
+        <div id="searchResults" class="absolute top-full left-0 right-0 mt-1 bg-slate-900/95 backdrop-blur border border-slate-700 rounded-xl shadow-2xl z-50 hidden max-h-56 overflow-y-auto"></div>
       </div>
-
+      <button id="geoBtn" title="Use my location" class="w-9 h-9 rounded-xl bg-slate-800 border border-slate-700 hover:border-sky-400 flex items-center justify-center text-slate-300 hover:text-sky-400 transition-colors shrink-0"><i class="fa-solid fa-location-crosshairs text-sm"></i></button>
     </div>
   </header>
 
-  <!-- Main Container -->
+  <!-- MAIN -->
   <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
 
-    <!-- Active Location & Weather Banner -->
+    <!-- Weather Banner -->
     <div class="glass-card p-4 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <div class="flex items-center gap-4">
-        <div id="weatherMainIcon" class="w-16 h-16 rounded-2xl bg-sky-500/10 border border-sky-400/20 flex items-center justify-center text-sky-400 text-3xl shadow-inner">
+        <div id="weatherMainIcon" class="w-14 h-14 rounded-2xl bg-sky-500/10 border border-sky-400/20 flex items-center justify-center text-sky-400 text-3xl shadow-inner">
           <i class="fa-solid fa-sun text-yellow-400"></i>
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h2 id="locationTitle" class="text-2xl font-bold text-white">Loading location...</h2>
-            <span id="liveBadge" class="px-2 py-0.5 text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full">LIVE</span>
+            <h2 id="locationTitle" class="text-2xl font-bold text-white">New York</h2>
+            <span class="px-2 py-0.5 text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full">LIVE</span>
           </div>
-          <p id="weatherSummary" class="text-slate-300 text-sm mt-0.5">Fetching latest meteorological data...</p>
+          <p id="weatherSummary" class="text-slate-300 text-sm mt-0.5">Loading live weather & precipitation...</p>
         </div>
       </div>
-
-      <!-- Quick Metrics Ribbon -->
-      <div class="grid grid-cols-3 sm:grid-cols-4 gap-3 w-full md:w-auto">
+      <div class="grid grid-cols-4 gap-3 w-full md:w-auto">
         <div class="bg-slate-800/60 border border-white/5 rounded-xl p-2.5 text-center">
           <span class="text-xs text-slate-400 block"><i class="fa-solid fa-temperature-three-quarters mr-1 text-red-400"></i>Temp</span>
           <span id="headerTemp" class="text-lg font-bold text-white">--°C</span>
@@ -231,76 +80,59 @@ body {
           <span id="headerHumidity" class="text-lg font-bold text-sky-300">--%</span>
         </div>
         <div class="bg-slate-800/60 border border-white/5 rounded-xl p-2.5 text-center">
-          <span class="text-xs text-slate-400 block"><i class="fa-solid fa-cloud-showers-heavy mr-1 text-cyan-400"></i>Rain (1h)</span>
+          <span class="text-xs text-slate-400 block"><i class="fa-solid fa-cloud-rain mr-1 text-cyan-400"></i>Rain 1h</span>
           <span id="headerPrecip" class="text-lg font-bold text-cyan-300">-- mm</span>
         </div>
-        <div class="bg-slate-800/60 border border-white/5 rounded-xl p-2.5 text-center col-span-3 sm:col-span-1">
+        <div class="bg-slate-800/60 border border-white/5 rounded-xl p-2.5 text-center">
           <span class="text-xs text-slate-400 block"><i class="fa-solid fa-wind mr-1 text-teal-400"></i>Wind</span>
           <span id="headerWind" class="text-lg font-bold text-teal-300">-- km/h</span>
         </div>
       </div>
     </div>
 
-    <!-- Navigation Tabs -->
-    <div class="flex items-center justify-start sm:justify-center overflow-x-auto pb-1 gap-2 border-b border-white/10">
-      <button class="nav-tab active px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 bg-sky-500/20 text-sky-300 border border-sky-400/40 transition-all" data-tab="forecast">
+    <!-- Tabs -->
+    <div class="flex items-center overflow-x-auto pb-1 gap-2 border-b border-white/10">
+      <button class="nav-tab px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 bg-sky-500/20 text-sky-300 border border-sky-400/40" data-tab="forecast">
         <i class="fa-solid fa-cloud-sun-rain"></i> <span>Weather & Rain Forecast</span>
       </button>
-      <button class="nav-tab px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 bg-transparent text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all" data-tab="hydration">
+      <button class="nav-tab px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 text-slate-400 hover:text-white hover:bg-white/5 border border-transparent" data-tab="hydration">
         <i class="fa-solid fa-glass-water"></i> <span>Water Intake App</span>
       </button>
-      <button class="nav-tab px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 bg-transparent text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all" data-tab="harvest">
+      <button class="nav-tab px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 text-slate-400 hover:text-white hover:bg-white/5 border border-transparent" data-tab="harvest">
         <i class="fa-solid fa-hand-holding-droplet"></i> <span>Rain Harvest & Eco</span>
       </button>
-      <button class="nav-tab px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 bg-transparent text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all" data-tab="analytics">
+      <button class="nav-tab px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 text-slate-400 hover:text-white hover:bg-white/5 border border-transparent" data-tab="analytics">
         <i class="fa-solid fa-chart-line"></i> <span>Water Insights</span>
       </button>
     </div>
 
-    <!-- TAB 1: WEATHER & RAIN FORECAST -->
-    <section id="tab-forecast" class="tab-content space-y-6">
-      
-      <!-- Hourly Rain & Precipitation Chart Card -->
+    <!-- TAB: FORECAST -->
+    <section id="tab-forecast" class="tab-content active space-y-6">
       <div class="glass-card p-5 sm:p-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
-            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-              <i class="fa-solid fa-chart-simple text-sky-400"></i>
-              <span>Next 24-Hour Precipitation & Rain Probability</span>
-            </h3>
-            <p class="text-xs text-slate-400">Hourly forecast of rain probability (%) and precipitation volume (mm)</p>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-chart-simple text-sky-400"></i> Next 24-Hour Precipitation</h3>
+            <p class="text-xs text-slate-400">Hourly rain probability (%) and precipitation volume (mm)</p>
           </div>
-          <div class="flex items-center gap-2 text-xs">
-            <span class="inline-flex items-center gap-1 text-sky-400 font-medium"><span class="w-3 h-3 bg-sky-500 rounded-sm"></span> Rain Vol (mm)</span>
-            <span class="inline-flex items-center gap-1 text-cyan-300 font-medium"><span class="w-3 h-1 bg-cyan-300 rounded-full"></span> Probability (%)</span>
+          <div class="flex items-center gap-3 text-xs">
+            <span class="flex items-center gap-1 text-sky-400"><span class="w-3 h-3 bg-sky-500 rounded-sm inline-block"></span> Rain Vol (mm)</span>
+            <span class="flex items-center gap-1 text-cyan-300"><span class="w-3 h-1 bg-cyan-300 rounded-full inline-block"></span> Probability (%)</span>
           </div>
         </div>
-        <div class="relative h-64 w-full">
-          <canvas id="hourlyPrecipChart"></canvas>
-        </div>
+        <div class="relative h-64 w-full"><canvas id="hourlyPrecipChart"></canvas></div>
       </div>
 
-      <!-- 7-Day Forecast Grid -->
       <div>
-        <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
-          <i class="fa-regular fa-calendar-days text-sky-400"></i>
-          <span>7-Day Water & Precipitation Forecast</span>
-        </h3>
+        <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2"><i class="fa-regular fa-calendar-days text-sky-400"></i> 7-Day Forecast</h3>
         <div id="dailyForecastGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-          <!-- Populated by JS -->
-          <div class="glass-card p-4 text-center animate-pulse">
-            <div class="h-4 bg-slate-700 rounded mb-2"></div>
-            <div class="h-8 bg-slate-700 rounded mb-2"></div>
-            <div class="h-4 bg-slate-700 rounded"></div>
-          </div>
+          <div class="glass-card p-4 text-center animate-pulse"><div class="h-4 bg-slate-700 rounded mb-2"></div><div class="h-8 bg-slate-700 rounded mb-2"></div><div class="h-4 bg-slate-700 rounded"></div></div>
         </div>
       </div>
 
-      <!-- Water Weather Advisory Card -->
       <div class="glass-card p-5 border-l-4 border-l-sky-400 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div class="space-y-1">
           <div class="flex items-center gap-2">
-            <span class="text-xs font-semibold px-2 py-0.5 bg-sky-500/20 text-sky-300 rounded-md uppercase tracking-wider">Smart Hydro Advisory</span>
+            <span class="text-xs font-semibold px-2 py-0.5 bg-sky-500/20 text-sky-300 rounded-md">SMART HYDRO ADVISORY</span>
             <span id="advisoryBadge" class="text-xs font-semibold px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-md">Optimal</span>
           </div>
           <p id="advisoryText" class="text-sm text-slate-200 font-medium">Checking weather conditions for personalized hydration advice...</p>
@@ -309,311 +141,159 @@ body {
           <i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i> Sync Water Target with Weather
         </button>
       </div>
-
     </section>
 
-    <!-- TAB 2: WATER APP / HYDRATION TRACKER -->
-    <section id="tab-hydration" class="tab-content hidden space-y-6">
-      
+    <!-- TAB: HYDRATION -->
+    <section id="tab-hydration" class="tab-content space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <!-- Left: Animated Water Tank / Glass -->
-        <div class="lg:col-span-5 glass-card p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
-          
+        <div class="lg:col-span-5 glass-card p-6 flex flex-col items-center text-center">
           <div class="mb-4">
             <span class="text-xs uppercase font-bold tracking-widest text-sky-400">Daily Water Progress</span>
             <h3 id="hydrationPctText" class="text-4xl font-extrabold text-white mt-1">0%</h3>
             <p class="text-xs text-slate-400 mt-0.5"><span id="intakeValue" class="text-sky-300 font-bold">0</span> / <span id="targetValue">2500</span> ml</p>
           </div>
-
-          <!-- Glass Gauge with Wave -->
           <div class="water-tank-container my-2">
-            <div id="waterTankInner" class="water-tank-inner">
-              <div class="water-wave"></div>
-            </div>
-            <!-- Glass reflection shine -->
+            <div id="waterTankInner" class="water-tank-inner"><div class="water-wave"></div></div>
             <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none"></div>
-            <!-- Indicator text inside tank -->
             <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
               <span id="tankRemaining" class="text-sm font-bold text-white drop-shadow-md">2500 ml to go</span>
             </div>
           </div>
-
-          <!-- Quick Goal Reset / Target Setting -->
           <div class="flex items-center gap-3 mt-4 text-xs">
-            <button id="openTargetModalBtn" class="text-slate-400 hover:text-sky-300 transition-colors">
-              <i class="fa-solid fa-sliders mr-1"></i> Adjust Goal
-            </button>
+            <button id="openTargetModalBtn" class="text-slate-400 hover:text-sky-300 transition-colors"><i class="fa-solid fa-sliders mr-1"></i>Adjust Goal</button>
             <span class="text-slate-600">•</span>
-            <button id="resetTodayBtn" class="text-slate-400 hover:text-red-400 transition-colors">
-              <i class="fa-solid fa-rotate-left mr-1"></i> Reset Today
-            </button>
+            <button id="resetTodayBtn" class="text-slate-400 hover:text-red-400 transition-colors"><i class="fa-solid fa-rotate-left mr-1"></i>Reset Today</button>
           </div>
-
         </div>
-
-        <!-- Right: Fast Water Log Actions & Timeline -->
         <div class="lg:col-span-7 space-y-6">
-          
-          <!-- Quick Log Controls -->
           <div class="glass-card p-6">
-            <h4 class="text-base font-bold text-white mb-3 flex items-center gap-2">
-              <i class="fa-solid fa-plus-circle text-sky-400"></i> Log Water Drink
-            </h4>
-
-            <div class="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-4">
-              <button class="btn-quick-add p-3 rounded-2xl flex flex-col items-center gap-1.5" data-amount="150">
-                <i class="fa-solid fa-mug-saucer text-sky-400 text-lg"></i>
-                <span class="text-sm font-bold text-white">+150 ml</span>
-                <span class="text-[10px] text-slate-400">Cup</span>
-              </button>
-              <button class="btn-quick-add p-3 rounded-2xl flex flex-col items-center gap-1.5" data-amount="250">
-                <i class="fa-solid fa-glass-water text-sky-400 text-lg"></i>
-                <span class="text-sm font-bold text-white">+250 ml</span>
-                <span class="text-[10px] text-slate-400">Glass</span>
-              </button>
-              <button class="btn-quick-add p-3 rounded-2xl flex flex-col items-center gap-1.5" data-amount="500">
-                <i class="fa-solid fa-bottle-water text-sky-400 text-lg"></i>
-                <span class="text-sm font-bold text-white">+500 ml</span>
-                <span class="text-[10px] text-slate-400">Bottle</span>
-              </button>
-              <button class="btn-quick-add p-3 rounded-2xl flex flex-col items-center gap-1.5 col-span-3 sm:col-span-1" data-amount="750">
-                <i class="fa-solid fa-flask text-sky-400 text-lg"></i>
-                <span class="text-sm font-bold text-white">+750 ml</span>
-                <span class="text-[10px] text-slate-400">Sports Flask</span>
-              </button>
+            <h4 class="text-base font-bold text-white mb-3 flex items-center gap-2"><i class="fa-solid fa-plus-circle text-sky-400"></i> Log Water Drink</h4>
+            <div class="grid grid-cols-4 gap-3 mb-4">
+              <button class="btn-quick-add p-3 flex flex-col items-center gap-1.5" data-amount="150"><i class="fa-solid fa-mug-saucer text-sky-400 text-lg"></i><span class="text-sm font-bold text-white">+150 ml</span><span class="text-[10px] text-slate-400">Cup</span></button>
+              <button class="btn-quick-add p-3 flex flex-col items-center gap-1.5" data-amount="250"><i class="fa-solid fa-glass-water text-sky-400 text-lg"></i><span class="text-sm font-bold text-white">+250 ml</span><span class="text-[10px] text-slate-400">Glass</span></button>
+              <button class="btn-quick-add p-3 flex flex-col items-center gap-1.5" data-amount="500"><i class="fa-solid fa-bottle-water text-sky-400 text-lg"></i><span class="text-sm font-bold text-white">+500 ml</span><span class="text-[10px] text-slate-400">Bottle</span></button>
+              <button class="btn-quick-add p-3 flex flex-col items-center gap-1.5" data-amount="750"><i class="fa-solid fa-flask text-sky-400 text-lg"></i><span class="text-sm font-bold text-white">+750 ml</span><span class="text-[10px] text-slate-400">Flask</span></button>
             </div>
-
-            <!-- Custom Amount Input -->
             <form id="customLogForm" class="flex items-center gap-2">
               <div class="relative flex-grow">
-                <input 
-                  type="number" 
-                  id="customAmountInput" 
-                  placeholder="Custom amount (e.g. 300)" 
-                  min="10" 
-                  max="5000"
-                  class="w-full pl-3 pr-10 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:border-sky-400"
-                  required
-                >
+                <input type="number" id="customAmountInput" placeholder="Custom amount (e.g. 300)" min="10" max="5000" class="w-full pl-3 pr-10 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:border-sky-400" required>
                 <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-semibold">ml</span>
               </div>
-              <button type="submit" class="btn-water px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2">
-                <i class="fa-solid fa-check"></i> Add
-              </button>
+              <button type="submit" class="btn-water px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-check"></i> Add</button>
             </form>
           </div>
-
-          <!-- Today's Intake History -->
           <div class="glass-card p-6">
             <h4 class="text-base font-bold text-white mb-3 flex items-center justify-between">
-              <span class="flex items-center gap-2">
-                <i class="fa-solid fa-clock-rotate-left text-sky-400"></i> Today's Water Timeline
-              </span>
+              <span class="flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-sky-400"></i> Today's Water Timeline</span>
               <span id="logCountBadge" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">0 drinks</span>
             </h4>
-
             <div id="todayLogsList" class="space-y-2 max-h-56 overflow-y-auto pr-1">
-              <!-- Logs populated by JS -->
-              <p class="text-sm text-slate-400 italic py-4 text-center">No water logged yet today. Take a sip and track your first glass!</p>
+              <p class="text-sm text-slate-400 italic py-4 text-center">No water logged yet today.</p>
             </div>
           </div>
-
         </div>
-
       </div>
-
     </section>
 
-    <!-- TAB 3: RAIN HARVEST & ECO ADVISOR -->
-    <section id="tab-harvest" class="tab-content hidden space-y-6">
-      
+    <!-- TAB: HARVEST -->
+    <section id="tab-harvest" class="tab-content space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <!-- Rain Harvesting Calculator -->
         <div class="lg:col-span-7 glass-card p-6 space-y-5">
           <div>
             <span class="text-xs font-bold uppercase tracking-wider text-cyan-400">Eco-Water Utility</span>
-            <h3 class="text-xl font-bold text-white mt-1 flex items-center gap-2">
-              <i class="fa-solid fa-cloud-arrow-down text-cyan-400"></i> Rainwater Harvesting Calculator
-            </h3>
-            <p class="text-xs text-slate-300 mt-1">Estimate how much pure rainwater you can harvest from forecasted rainfall for your home or garden.</p>
+            <h3 class="text-xl font-bold text-white mt-1 flex items-center gap-2"><i class="fa-solid fa-cloud-arrow-down text-cyan-400"></i> Rainwater Harvesting Calculator</h3>
+            <p class="text-xs text-slate-300 mt-1">Estimate how much pure rainwater you can harvest from forecasted rainfall.</p>
           </div>
-
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1.5">Roof / Catchment Area (m²)</label>
-              <div class="relative">
-                <input type="number" id="roofAreaInput" value="120" min="10" max="5000" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-sky-400">
-                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">m²</span>
-              </div>
+              <div class="relative"><input type="number" id="roofAreaInput" value="120" min="10" max="5000" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-sky-400"><span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">m²</span></div>
             </div>
-
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1.5">Expected Rainfall (mm)</label>
-              <div class="relative">
-                <input type="number" id="rainfallInput" value="25" min="1" max="1000" step="0.5" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-sky-400">
-                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">mm</span>
-              </div>
-              <button id="useForecastRainBtn" class="text-[11px] text-sky-400 hover:underline mt-1 block">
-                <i class="fa-solid fa-bolt mr-1"></i>Use this week's forecasted rain
-              </button>
+              <div class="relative"><input type="number" id="rainfallInput" value="25" min="1" max="1000" step="0.5" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-sky-400"><span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">mm</span></div>
+              <button id="useForecastRainBtn" class="text-[11px] text-sky-400 hover:underline mt-1 block"><i class="fa-solid fa-bolt mr-1"></i>Use this week's forecasted rain</button>
             </div>
           </div>
-
-          <!-- Harvest Calculation Results Card -->
           <div class="bg-gradient-to-br from-sky-950/60 to-slate-900/80 border border-sky-500/30 rounded-2xl p-5 space-y-4">
             <div class="flex items-center justify-between">
               <span class="text-xs text-slate-300 font-medium">Estimated Harvest Yield:</span>
               <span class="text-xs bg-sky-500/20 text-sky-300 px-2.5 py-0.5 rounded-full border border-sky-400/30 font-semibold">85% Runoff Efficiency</span>
             </div>
-
             <div class="flex items-baseline gap-2">
               <span id="harvestLiters" class="text-4xl font-extrabold text-sky-300">2,550</span>
               <span class="text-lg font-semibold text-slate-200">Liters</span>
               <span id="harvestGallons" class="text-xs text-slate-400 ml-2">(~673 Gallons)</span>
             </div>
-
-            <!-- Impact Equivalents -->
             <div class="grid grid-cols-3 gap-2 pt-2 border-t border-white/10 text-center">
-              <div class="bg-slate-800/40 p-2 rounded-xl">
-                <i class="fa-solid fa-toilet text-cyan-400 text-sm mb-1"></i>
-                <span id="flushCount" class="block text-base font-bold text-white">425</span>
-                <span class="text-[10px] text-slate-400">Toilet Flushes</span>
-              </div>
-              <div class="bg-slate-800/40 p-2 rounded-xl">
-                <i class="fa-solid fa-shower text-sky-400 text-sm mb-1"></i>
-                <span id="showerMinutes" class="block text-base font-bold text-white">283</span>
-                <span class="text-[10px] text-slate-400">Shower Mins</span>
-              </div>
-              <div class="bg-slate-800/40 p-2 rounded-xl">
-                <i class="fa-solid fa-seedling text-emerald-400 text-sm mb-1"></i>
-                <span id="gardenDays" class="block text-base font-bold text-white">170</span>
-                <span class="text-[10px] text-slate-400">Garden Days</span>
-              </div>
+              <div class="bg-slate-800/40 p-2 rounded-xl"><i class="fa-solid fa-toilet text-cyan-400 text-sm mb-1"></i><span id="flushCount" class="block text-base font-bold text-white">425</span><span class="text-[10px] text-slate-400">Toilet Flushes</span></div>
+              <div class="bg-slate-800/40 p-2 rounded-xl"><i class="fa-solid fa-shower text-sky-400 text-sm mb-1"></i><span id="showerMinutes" class="block text-base font-bold text-white">283</span><span class="text-[10px] text-slate-400">Shower Mins</span></div>
+              <div class="bg-slate-800/40 p-2 rounded-xl"><i class="fa-solid fa-seedling text-emerald-400 text-sm mb-1"></i><span id="gardenDays" class="block text-base font-bold text-white">170</span><span class="text-[10px] text-slate-400">Garden Days</span></div>
             </div>
           </div>
-
         </div>
-
-        <!-- Garden & Water Conservation Advisor -->
         <div class="lg:col-span-5 space-y-4">
-          
           <div class="glass-card p-6">
-            <h4 class="text-base font-bold text-white mb-3 flex items-center gap-2">
-              <i class="fa-solid fa-plant-wilt text-emerald-400"></i> Smart Garden Irrigation
-            </h4>
+            <h4 class="text-base font-bold text-white mb-3 flex items-center gap-2"><i class="fa-solid fa-plant-wilt text-emerald-400"></i> Smart Garden Irrigation</h4>
             <div id="gardenStatusBox" class="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-200 text-sm space-y-2">
-              <div class="font-bold flex items-center gap-2">
-                <i class="fa-solid fa-circle-check text-emerald-400"></i> Ready to water
-              </div>
-              <p id="gardenStatusText" class="text-xs text-slate-300">No heavy precipitation forecasted today. Water potted plants in the morning to retain soil moisture.</p>
+              <div class="font-bold flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400"></i> Ready to water</div>
+              <p id="gardenStatusText" class="text-xs text-slate-300">No heavy precipitation forecasted today. Water potted plants in the morning.</p>
             </div>
           </div>
-
           <div class="glass-card p-6">
-            <h4 class="text-base font-bold text-white mb-3 flex items-center gap-2">
-              <i class="fa-solid fa-lightbulb text-amber-400"></i> Quick Water Saving Tips
-            </h4>
+            <h4 class="text-base font-bold text-white mb-3 flex items-center gap-2"><i class="fa-solid fa-lightbulb text-amber-400"></i> Water Saving Tips</h4>
             <ul class="space-y-2.5 text-xs text-slate-300">
-              <li class="flex items-start gap-2">
-                <i class="fa-solid fa-droplet text-sky-400 mt-0.5"></i>
-                <span>Fix leaky faucets: A dripping tap can waste over 15 liters of water daily.</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <i class="fa-solid fa-droplet text-sky-400 mt-0.5"></i>
-                <span>Use aerators on sink faucets to reduce water flow by up to 50% without losing pressure.</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <i class="fa-solid fa-droplet text-sky-400 mt-0.5"></i>
-                <span>Collect vegetable wash water to nourish indoor houseplants.</span>
-              </li>
+              <li class="flex items-start gap-2"><i class="fa-solid fa-droplet text-sky-400 mt-0.5"></i><span>Fix leaky faucets: A dripping tap can waste over 15 liters of water daily.</span></li>
+              <li class="flex items-start gap-2"><i class="fa-solid fa-droplet text-sky-400 mt-0.5"></i><span>Use aerators on sink faucets to reduce water flow by up to 50%.</span></li>
+              <li class="flex items-start gap-2"><i class="fa-solid fa-droplet text-sky-400 mt-0.5"></i><span>Collect vegetable wash water to nourish indoor houseplants.</span></li>
             </ul>
           </div>
-
         </div>
-
       </div>
-
     </section>
 
-    <!-- TAB 4: WATER INSIGHTS & ANALYTICS -->
-    <section id="tab-analytics" class="tab-content hidden space-y-6">
-      
+    <!-- TAB: ANALYTICS -->
+    <section id="tab-analytics" class="tab-content space-y-6">
       <div class="glass-card p-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
-            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-              <i class="fa-solid fa-chart-column text-sky-400"></i>
-              <span>7-Day Water Intake vs Daily Target</span>
-            </h3>
-            <p class="text-xs text-slate-400">Review your daily hydration consistency and streak over the past week</p>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-chart-column text-sky-400"></i> 7-Day Water Intake vs Target</h3>
+            <p class="text-xs text-slate-400">Review your daily hydration consistency over the past week</p>
           </div>
           <div class="flex items-center gap-4 text-xs">
-            <div class="flex items-center gap-1.5">
-              <span class="w-3 h-3 bg-sky-500 rounded-sm"></span>
-              <span class="text-slate-300">Intake (ml)</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <span class="w-3 h-0.5 bg-red-400 rounded-full"></span>
-              <span class="text-slate-300">Target (ml)</span>
-            </div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-sky-500 rounded-sm inline-block"></span><span class="text-slate-300">Intake (ml)</span></div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-red-400 rounded-full inline-block"></span><span class="text-slate-300">Target (ml)</span></div>
           </div>
         </div>
-
-        <div class="relative h-64 w-full">
-          <canvas id="weeklyHydrationChart"></canvas>
-        </div>
+        <div class="relative h-64 w-full"><canvas id="weeklyHydrationChart"></canvas></div>
       </div>
-
-      <!-- Stats Counters -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="glass-card p-5 text-center">
-          <span class="text-xs text-slate-400 uppercase font-bold tracking-wider">7-Day Total</span>
-          <h4 id="statWeeklyTotal" class="text-2xl font-extrabold text-sky-300 mt-1">0 L</h4>
-          <p class="text-[11px] text-slate-400 mt-0.5">Total fluid consumed</p>
-        </div>
-        <div class="glass-card p-5 text-center">
-          <span class="text-xs text-slate-400 uppercase font-bold tracking-wider">Daily Average</span>
-          <h4 id="statDailyAvg" class="text-2xl font-extrabold text-cyan-300 mt-1">0 ml</h4>
-          <p class="text-[11px] text-slate-400 mt-0.5">Average per day</p>
-        </div>
-        <div class="glass-card p-5 text-center">
-          <span class="text-xs text-slate-400 uppercase font-bold tracking-wider">Goal Completion Rate</span>
-          <h4 id="statGoalRate" class="text-2xl font-extrabold text-emerald-400 mt-1">0%</h4>
-          <p class="text-[11px] text-slate-400 mt-0.5">Days target met</p>
-        </div>
+        <div class="glass-card p-5 text-center"><span class="text-xs text-slate-400 uppercase font-bold tracking-wider">7-Day Total</span><h4 id="statWeeklyTotal" class="text-2xl font-extrabold text-sky-300 mt-1">0 L</h4><p class="text-[11px] text-slate-400 mt-0.5">Total fluid consumed</p></div>
+        <div class="glass-card p-5 text-center"><span class="text-xs text-slate-400 uppercase font-bold tracking-wider">Daily Average</span><h4 id="statDailyAvg" class="text-2xl font-extrabold text-cyan-300 mt-1">0 ml</h4><p class="text-[11px] text-slate-400 mt-0.5">Average per day</p></div>
+        <div class="glass-card p-5 text-center"><span class="text-xs text-slate-400 uppercase font-bold tracking-wider">Goal Completion Rate</span><h4 id="statGoalRate" class="text-2xl font-extrabold text-emerald-400 mt-1">0%</h4><p class="text-[11px] text-slate-400 mt-0.5">Days target met</p></div>
       </div>
-
     </section>
 
   </main>
 
-  <!-- Target Setting Modal -->
+  <!-- Target Modal -->
   <div id="targetModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
     <div class="glass-card max-w-md w-full p-6 space-y-4 border border-sky-500/30">
       <div class="flex items-center justify-between">
-        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-sliders text-sky-400"></i> Hydration Target Settings
-        </h3>
-        <button id="closeTargetModalBtn" class="text-slate-400 hover:text-white">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-sliders text-sky-400"></i> Hydration Target Settings</h3>
+        <button id="closeTargetModalBtn" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
-
       <form id="targetForm" class="space-y-4">
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1">Daily Target (ml)</label>
           <input type="number" id="baseTargetInput" min="500" max="8000" step="50" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-sky-400" required>
-          <p class="text-[11px] text-slate-400 mt-1">Standard recommendation is 2,000 - 3,000 ml for adults.</p>
+          <p class="text-[11px] text-slate-400 mt-1">Recommendation: 2,000–3,000 ml for adults.</p>
         </div>
-
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1">Body Weight (kg)</label>
           <input type="number" id="weightInput" min="30" max="250" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-sky-400">
-          <p class="text-[11px] text-slate-400 mt-1">Rough rule of thumb: ~35ml of water per kg of body weight.</p>
+          <p class="text-[11px] text-slate-400 mt-1">Rough rule: ~35 ml per kg of body weight.</p>
         </div>
-
         <div class="flex items-center justify-end gap-2 pt-2">
           <button type="button" id="cancelTargetBtn" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300">Cancel</button>
           <button type="submit" class="btn-water px-4 py-2 rounded-xl text-xs font-bold">Save Target</button>
@@ -622,887 +302,516 @@ body {
     </div>
   </div>
 
-  <!-- Toast Notification Container -->
+  <!-- Toast Container -->
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
 
   <!-- Footer -->
   <footer class="mt-auto border-t border-white/10 bg-slate-950/60 py-4 px-4 text-center text-xs text-slate-400">
-    <p>AquaCast 💧 • Powered by Open-Meteo & Node.js Express • Stay Hydrated & Conserve Water</p>
+    <p>AquaCast 💧 • Powered by Open-Meteo • Stay Hydrated & Conserve Water</p>
   </footer>
 
-  <!-- App Script -->
-  
 <script>
-// AquaCast Frontend Core Controller
-function initAquaCast() {
-  // State
-  let state = {
+(function() {
+  'use strict';
+
+  var state = {
     city: 'New York',
     lat: 40.7128,
     lon: -74.0060,
     weatherData: null,
-    hydrationData: {
-      target: 2500,
-      totalDrank: 0,
-      logs: [],
-      settings: { baseTarget: 2500, weight: 70 }
-    },
-    weeklyHistory: [],
     recommendedExtraWater: 0
   };
+  var hourlyChartInst = null;
+  var weeklyChartInst = null;
 
-  // Chart Instances
-  let hourlyPrecipChartInstance = null;
-  let weeklyHydrationChartInstance = null;
+  var WX = {
+    0:{l:'Clear Sky',i:'sun'},1:{l:'Mainly Clear',i:'sun'},2:{l:'Partly Cloudy',i:'cloud-sun'},
+    3:{l:'Overcast',i:'cloud'},45:{l:'Foggy',i:'fog'},48:{l:'Rime Fog',i:'fog'},
+    51:{l:'Light Drizzle',i:'rain'},53:{l:'Moderate Drizzle',i:'rain'},55:{l:'Dense Drizzle',i:'rain'},
+    61:{l:'Slight Rain',i:'rain'},63:{l:'Moderate Rain',i:'rain'},65:{l:'Heavy Rain',i:'rain-heavy'},
+    71:{l:'Light Snow',i:'snow'},73:{l:'Moderate Snow',i:'snow'},75:{l:'Heavy Snow',i:'snow'},
+    80:{l:'Rain Showers',i:'rain'},81:{l:'Heavy Showers',i:'rain-heavy'},82:{l:'Violent Showers',i:'storm'},
+    95:{l:'Thunderstorm',i:'storm'},96:{l:'Thunderstorm+Hail',i:'storm'}
+  };
+  function wxMeta(code) { return WX[code] || {l:'Variable',i:'cloud'}; }
+  function wxIcon(i) {
+    var map = {
+      'sun':'<i class="fa-solid fa-sun text-yellow-400 text-3xl"></i>',
+      'cloud-sun':'<i class="fa-solid fa-cloud-sun text-amber-300 text-3xl"></i>',
+      'cloud':'<i class="fa-solid fa-cloud text-slate-300 text-3xl"></i>',
+      'rain':'<i class="fa-solid fa-cloud-rain text-sky-400 text-3xl"></i>',
+      'rain-heavy':'<i class="fa-solid fa-cloud-showers-heavy text-sky-400 text-3xl"></i>',
+      'storm':'<i class="fa-solid fa-cloud-bolt text-yellow-300 text-3xl"></i>',
+      'snow':'<i class="fa-regular fa-snowflake text-sky-200 text-3xl"></i>',
+      'fog':'<i class="fa-solid fa-smog text-slate-300 text-3xl"></i>'
+    };
+    return map[i] || '<i class="fa-solid fa-cloud-sun text-sky-300 text-3xl"></i>';
+  }
 
-  // DOM Elements
-  const cityInput = document.getElementById('cityInput');
-  const searchResults = document.getElementById('searchResults');
-  const clearSearchBtn = document.getElementById('clearSearchBtn');
-  const geoBtn = document.getElementById('geoBtn');
-  const locationTitle = document.getElementById('locationTitle');
-  const weatherSummary = document.getElementById('weatherSummary');
-  const weatherMainIcon = document.getElementById('weatherMainIcon');
-  const headerTemp = document.getElementById('headerTemp');
-  const headerHumidity = document.getElementById('headerHumidity');
-  const headerPrecip = document.getElementById('headerPrecip');
-  const headerWind = document.getElementById('headerWind');
-  const dailyForecastGrid = document.getElementById('dailyForecastGrid');
-  const advisoryBadge = document.getElementById('advisoryBadge');
-  const advisoryText = document.getElementById('advisoryText');
-  const applyHydrationBoostBtn = document.getElementById('applyHydrationBoostBtn');
+  function el(id) { return document.getElementById(id); }
+  function setText(id, val) { var e=el(id); if(e) e.textContent=val; }
+  function setHTML(id, val) { var e=el(id); if(e) e.innerHTML=val; }
 
-  // Hydration DOM Elements
-  const hydrationPctText = document.getElementById('hydrationPctText');
-  const intakeValue = document.getElementById('intakeValue');
-  const targetValue = document.getElementById('targetValue');
-  const tankRemaining = document.getElementById('tankRemaining');
-  const waterTankInner = document.getElementById('waterTankInner');
-  const todayLogsList = document.getElementById('todayLogsList');
-  const logCountBadge = document.getElementById('logCountBadge');
-  const customLogForm = document.getElementById('customLogForm');
-  const customAmountInput = document.getElementById('customAmountInput');
-  const resetTodayBtn = document.getElementById('resetTodayBtn');
-  const openTargetModalBtn = document.getElementById('openTargetModalBtn');
-  const closeTargetModalBtn = document.getElementById('closeTargetModalBtn');
-  const cancelTargetBtn = document.getElementById('cancelTargetBtn');
-  const targetModal = document.getElementById('targetModal');
-  const targetForm = document.getElementById('targetForm');
-  const baseTargetInput = document.getElementById('baseTargetInput');
-  const weightInput = document.getElementById('weightInput');
+  function toast(msg, type) {
+    var c = el('toastContainer'); if(!c) return;
+    var d = document.createElement('div');
+    var bg = type==='success'?'bg-emerald-700/90 border-emerald-400/40':'bg-sky-700/90 border-sky-400/40';
+    var ic = type==='success'?'fa-circle-check':'fa-info-circle';
+    d.className = bg+' backdrop-blur border text-white text-xs px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 pointer-events-auto transition-opacity duration-300';
+    d.innerHTML = '<i class="fa-solid '+ic+'"></i><span>'+msg+'</span>';
+    c.appendChild(d);
+    setTimeout(function(){ d.style.opacity='0'; setTimeout(function(){ d.remove(); },300); }, 3000);
+  }
 
-  // Rain Harvest Elements
-  const roofAreaInput = document.getElementById('roofAreaInput');
-  const rainfallInput = document.getElementById('rainfallInput');
-  const useForecastRainBtn = document.getElementById('useForecastRainBtn');
-  const harvestLiters = document.getElementById('harvestLiters');
-  const harvestGallons = document.getElementById('harvestGallons');
-  const flushCount = document.getElementById('flushCount');
-  const showerMinutes = document.getElementById('showerMinutes');
-  const gardenDays = document.getElementById('gardenDays');
-  const gardenStatusText = document.getElementById('gardenStatusText');
+  function playDrop() {
+    try {
+      var Ctx = window.AudioContext||window.webkitAudioContext; if(!Ctx) return;
+      var ctx=new Ctx(), osc=ctx.createOscillator(), g=ctx.createGain();
+      osc.type='sine';
+      osc.frequency.setValueAtTime(600,ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1200,ctx.currentTime+0.08);
+      osc.frequency.exponentialRampToValueAtTime(800,ctx.currentTime+0.2);
+      g.gain.setValueAtTime(0.3,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.25);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime+0.25);
+    } catch(e){}
+  }
 
-  // Analytics Elements
-  const statWeeklyTotal = document.getElementById('statWeeklyTotal');
-  const statDailyAvg = document.getElementById('statDailyAvg');
-  const statGoalRate = document.getElementById('statGoalRate');
+  function fetchWeather(lat, lon, city) {
+    setText('locationTitle', city || 'Updating...');
+    setText('weatherSummary', 'Fetching live weather data...');
 
-  // Tabs
-  const navTabs = document.querySelectorAll('.nav-tab');
-  const tabContents = document.querySelectorAll('.tab-content');
+    var url = 'https://api.open-meteo.com/v1/forecast'
+      + '?latitude=' + lat
+      + '&longitude=' + lon
+      + '&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m'
+      + '&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code'
+      + '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max'
+      + '&timezone=auto'
+      + '&forecast_days=7';
 
-  // Tab Switching
-  navTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      const targetTab = tab.dataset.tab;
-      navTabs.forEach(t => {
-        t.classList.remove('active', 'bg-sky-500/20', 'text-sky-300', 'border-sky-400/40');
-        t.classList.add('bg-transparent', 'text-slate-400', 'border-transparent');
+    fetch(url)
+      .then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(raw) {
+        var code   = (raw.current && raw.current.weather_code) ? raw.current.weather_code : 0;
+        var meta   = wxMeta(code);
+        var temp   = (raw.current && raw.current.temperature_2m != null) ? raw.current.temperature_2m : 24;
+        var humid  = (raw.current && raw.current.relative_humidity_2m != null) ? raw.current.relative_humidity_2m : 50;
+        var wind   = (raw.current && raw.current.wind_speed_10m != null) ? raw.current.wind_speed_10m : 0;
+        var appT   = (raw.current && raw.current.apparent_temperature != null) ? raw.current.apparent_temperature : temp;
+        var precip = (raw.current && raw.current.rain != null) ? raw.current.rain : ((raw.current && raw.current.precipitation) ? raw.current.precipitation : 0);
+
+        var boost = 0;
+        if (temp > 22) boost += Math.round(((temp - 22) / 5) * 200);
+        if (humid < 40) boost += 150;
+        state.recommendedExtraWater = boost;
+
+        var hTimes  = (raw.hourly && raw.hourly.time) || [];
+        var hPrecip = (raw.hourly && raw.hourly.precipitation) || [];
+        var hProb   = (raw.hourly && raw.hourly.precipitation_probability) || [];
+        var hTemp   = (raw.hourly && raw.hourly.temperature_2m) || [];
+        var nowH    = new Date().getHours();
+        var next24  = [];
+        for (var i = 0; i < Math.min(24, hTimes.length); i++) {
+          var idx = (nowH + i) % hTimes.length;
+          var tStr = hTimes[idx] ? new Date(hTimes[idx]).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : ('+'+i+'h');
+          next24.push({ time:tStr, precipMm: hPrecip[idx]||0, precipProb: hProb[idx]||0, temp: hTemp[idx]||0 });
+        }
+
+        var dTimes = (raw.daily && raw.daily.time) || [];
+        var dMax   = (raw.daily && raw.daily.temperature_2m_max) || [];
+        var dMin   = (raw.daily && raw.daily.temperature_2m_min) || [];
+        var dRain  = (raw.daily && raw.daily.precipitation_sum) || [];
+        var dProb  = (raw.daily && raw.daily.precipitation_probability_max) || [];
+        var dCodes = (raw.daily && raw.daily.weather_code) || [];
+        var daily  = [];
+        for (var j = 0; j < dTimes.length; j++) {
+          var dObj = new Date(dTimes[j]);
+          var dName = j===0 ? 'Today' : dObj.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+          daily.push({ dayName:dName, tempMax:dMax[j]||0, tempMin:dMin[j]||0, rainMm:dRain[j]||0, rainProb:dProb[j]||0, meta:wxMeta(dCodes[j]||0) });
+        }
+
+        var rainProbToday = daily[0] ? daily[0].rainProb : 0;
+        var rain3d = daily.slice(0,3).reduce(function(a,d){ return a+d.rainMm; }, 0);
+        var gardenAdv, gardenCls;
+        if (rainProbToday > 60 || rain3d > 10) {
+          gardenAdv = '🌧️ High rain expected! Skip outdoor watering to save water.';
+          gardenCls = 'p-4 rounded-xl bg-sky-950/50 border border-sky-400/40 text-sky-200 text-sm space-y-2';
+        } else if (temp > 32 && rainProbToday < 20) {
+          gardenAdv = '☀️ Hot & dry! Water plants early morning or evening.';
+          gardenCls = 'p-4 rounded-xl bg-amber-950/40 border border-amber-500/30 text-amber-200 text-sm space-y-2';
+        } else {
+          gardenAdv = '✅ Normal watering needed today.';
+          gardenCls = 'p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-200 text-sm space-y-2';
+        }
+
+        state.weatherData = { daily: daily, hourly: next24 };
+        state.lat = lat; state.lon = lon; state.city = city;
+
+        setText('locationTitle', city || 'Selected Location');
+        setText('weatherSummary', meta.l + ' • Feels like ' + Math.round(appT) + '°C');
+        setHTML('weatherMainIcon', wxIcon(meta.i));
+        setText('headerTemp', Math.round(temp) + '°C');
+        setText('headerHumidity', humid + '%');
+        setText('headerPrecip', precip.toFixed(1) + ' mm');
+        setText('headerWind', Math.round(wind) + ' km/h');
+
+        renderHourlyChart(next24);
+        renderDailyForecast(daily);
+        renderAdvisory(boost, temp, gardenAdv, gardenCls);
+        calcHarvest();
+
+        toast('Weather loaded for ' + city, 'info');
+      })
+      .catch(function(err) {
+        console.error('Weather fetch error:', err);
+        toast('Could not load weather data.', 'error');
       });
-      tab.classList.add('active', 'bg-sky-500/20', 'text-sky-300', 'border-sky-400/40');
-      tab.classList.remove('bg-transparent', 'text-slate-400', 'border-transparent');
-
-      tabContents.forEach(c => c.classList.add('hidden'));
-      const activeSection = document.getElementById(`tab-${targetTab}`);
-      if (activeSection) {
-        activeSection.classList.remove('hidden');
-      }
-
-      if (targetTab === 'analytics') {
-        renderWeeklyHydrationChart();
-      } else if (targetTab === 'forecast') {
-        if (hourlyPrecipChartInstance) hourlyPrecipChartInstance.resize();
-      }
-    });
-  });
-
-  // Sound Effect via Web Audio API (Water droplet chime)
-  function playWaterDropSound() {
-    try {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) return;
-      const ctx = new AudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = 'sine';
-      // Pitch drop creates water drip sound
-      osc.frequency.setValueAtTime(600, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.08);
-      osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.2);
-
-      gain.gain.setValueAtTime(0.3, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start();
-      osc.stop(ctx.currentTime + 0.25);
-    } catch (e) {
-      // Audio not permitted or supported, silent fallback
-    }
   }
 
-  // Toast Notifications
-  function showToast(message, type = 'info') {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
-    const bg = type === 'success' ? 'bg-emerald-600/90 border-emerald-400/40' : 'bg-sky-600/90 border-sky-400/40';
-    const icon = type === 'success' ? 'fa-circle-check' : 'fa-info-circle';
-
-    toast.className = `${bg} backdrop-blur-md border text-white text-xs px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 transform transition-all duration-300 translate-y-2 opacity-0 pointer-events-auto`;
-    toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
-    
-    container.appendChild(toast);
-    setTimeout(() => {
-      toast.classList.remove('translate-y-2', 'opacity-0');
-    }, 10);
-
-    setTimeout(() => {
-      toast.classList.add('opacity-0', 'translate-y-2');
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
-  }
-
-  // Weather Condition Icon Mapping
-  function getWeatherIconHtml(iconName, condition) {
-    switch (iconName) {
-      case 'sun':
-        return '<i class="fa-solid fa-sun text-yellow-400"></i>';
-      case 'sun-dim':
-      case 'cloud-sun':
-        return '<i class="fa-solid fa-cloud-sun text-amber-300"></i>';
-      case 'cloud':
-        return '<i class="fa-solid fa-cloud text-slate-300"></i>';
-      case 'cloud-drizzle':
-        return '<i class="fa-solid fa-cloud-rain text-cyan-300"></i>';
-      case 'cloud-rain':
-      case 'cloud-heavy-rain':
-        return '<i class="fa-solid fa-cloud-showers-heavy text-sky-400"></i>';
-      case 'cloud-lightning':
-      case 'cloud-lightning-rain':
-        return '<i class="fa-solid fa-cloud-bolt text-yellow-300"></i>';
-      case 'snowflake':
-        return '<i class="fa-regular fa-snowflake text-sky-200"></i>';
-      case 'fog':
-        return '<i class="fa-solid fa-smog text-slate-300"></i>';
-      default:
-        return '<i class="fa-solid fa-cloud-sun text-sky-300"></i>';
-    }
-  }
-
-  // 1. Fetch & Render Weather (Direct Open-Meteo API)
-  async function fetchWeather(lat, lon, cityName) {
-    try {
-      locationTitle.textContent = cityName || 'Updating...';
-      weatherSummary.textContent = 'Fetching precipitation and atmospheric metrics...';
-
-      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,surface_pressure&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,uv_index_max&timezone=auto`;
-      const res = await fetch(weatherUrl);
-      if (!res.ok) throw new Error('Could not fetch weather data');
-      
-      const raw = await res.json();
-      const currentCode = raw.current?.weather_code ?? 0;
-      const currentMeta = getWeatherMeta(currentCode);
-      const temp = raw.current?.temperature_2m ?? 24;
-      const humidity = raw.current?.relative_humidity_2m ?? 50;
-
-      let weatherExtraWater = 0;
-      if (temp > 22) weatherExtraWater += Math.round(((temp - 22) / 5) * 200);
-      if (humidity < 40) weatherExtraWater += 150;
-
-      const currentHourIndex = new Date().getHours();
-      const next24Hours = [];
-      const hourlyTimes = raw.hourly?.time || [];
-      const hourlyPrecip = raw.hourly?.precipitation || [];
-      const hourlyProb = raw.hourly?.precipitation_probability || [];
-      const hourlyTemp = raw.hourly?.temperature_2m || [];
-      const hourlyCodes = raw.hourly?.weather_code || [];
-
-      for (let i = 0; i < Math.min(24, hourlyTimes.length); i++) {
-        const idx = (currentHourIndex + i) % hourlyTimes.length;
-        const timeStr = hourlyTimes[idx] || '';
-        const hour = timeStr ? new Date(timeStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : `+${i}h`;
-        next24Hours.push({
-          time: hour,
-          temp: hourlyTemp[idx] ?? 0,
-          precipMm: hourlyPrecip[idx] ?? 0,
-          precipProb: hourlyProb[idx] ?? 0,
-          weather: getWeatherMeta(hourlyCodes[idx] ?? 0)
-        });
-      }
-
-      const dailyForecast = [];
-      const dailyTimes = raw.daily?.time || [];
-      const dailyMax = raw.daily?.temperature_2m_max || [];
-      const dailyMin = raw.daily?.temperature_2m_min || [];
-      const dailyRain = raw.daily?.precipitation_sum || [];
-      const dailyRainProb = raw.daily?.precipitation_probability_max || [];
-      const dailyCodes = raw.daily?.weather_code || [];
-
-      for (let i = 0; i < dailyTimes.length; i++) {
-        const dateObj = new Date(dailyTimes[i]);
-        const dayName = i === 0 ? 'Today' : dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-        dailyForecast.push({
-          date: dailyTimes[i],
-          dayName,
-          tempMax: dailyMax[i] ?? 0,
-          tempMin: dailyMin[i] ?? 0,
-          rainSumMm: dailyRain[i] ?? 0,
-          rainProbMax: dailyRainProb[i] ?? 0,
-          weather: getWeatherMeta(dailyCodes[i] ?? 0)
-        });
-      }
-
-      const totalRainNext3Days = dailyForecast.slice(0, 3).reduce((acc, curr) => acc + curr.rainSumMm, 0);
-      const rainProbToday = dailyForecast[0]?.rainProbMax || 0;
-      let gardenAdvice = "Normal watering needed today.";
-      let gardenBadge = "water-ok";
-      if (rainProbToday > 60 || totalRainNext3Days > 10) {
-        gardenAdvice = "🌧️ High rain expected! Skip outdoor garden watering to save water.";
-        gardenBadge = "skip-watering";
-      } else if (temp > 32 && rainProbToday < 20) {
-        gardenAdvice = "☀️ Hot & dry conditions. Water plants early morning or evening to prevent evaporation.";
-        gardenBadge = "water-early";
-      }
-
-      const data = {
-        location: { city: cityName || 'Selected Location' },
-        current: {
-          temp,
-          apparentTemp: raw.current?.apparent_temperature ?? temp,
-          humidity,
-          windSpeed: raw.current?.wind_speed_10m ?? 0,
-          precipitationMm: raw.current?.rain ?? raw.current?.precipitation ?? 0,
-          weather: currentMeta
-        },
-        hydrationBoost: {
-          recommendedExtraWater: weatherExtraWater,
-          reason: temp > 28 ? 'High ambient temperature requires increased fluid intake.' : 'Standard hydration weather.'
-        },
-        ecoAdvisory: { gardenAdvice, gardenBadge },
-        hourly: next24Hours,
-        daily: dailyForecast
-      };
-
-      state.weatherData = data;
-      state.lat = lat;
-      state.lon = lon;
-      state.city = cityName;
-      state.recommendedExtraWater = weatherExtraWater;
-
-      renderWeatherOverview(data);
-      renderHourlyPrecipChart(data.hourly || []);
-      renderDailyForecast(data.daily || []);
-      renderEcoAdvisory(data.ecoAdvisory, data.hydrationBoost);
-      calculateRainHarvest();
-
-      showToast(`Weather updated for ${state.city}`, 'info');
-    } catch (err) {
-      console.error(err);
-      showToast('Error loading forecast data', 'error');
-    }
-  }
-
-  function renderWeatherOverview(data) {
-    const cur = data.current;
-    locationTitle.textContent = data.location.city;
-    weatherSummary.textContent = `${cur.weather.label} • Feels like ${Math.round(cur.apparentTemp)}°C`;
-    weatherMainIcon.innerHTML = getWeatherIconHtml(cur.weather.icon, cur.weather.condition);
-    
-    headerTemp.textContent = `${Math.round(cur.temp)}°C`;
-    headerHumidity.textContent = `${cur.humidity}%`;
-    headerPrecip.textContent = `${cur.precipitationMm} mm`;
-    headerWind.textContent = `${Math.round(cur.windSpeed)} km/h`;
-  }
-
-  // 2. Render Hourly Precipitation Chart (Chart.js)
-  function renderHourlyPrecipChart(hourlyList) {
-    const ctx = document.getElementById('hourlyPrecipChart').getContext('2d');
-    const labels = hourlyList.map(h => h.time);
-    const rainVol = hourlyList.map(h => h.precipMm);
-    const rainProb = hourlyList.map(h => h.precipProb);
-
-    if (hourlyPrecipChartInstance) {
-      hourlyPrecipChartInstance.destroy();
-    }
-
-    hourlyPrecipChartInstance = new Chart(ctx, {
-      type: 'bar',
+  function renderHourlyChart(list) {
+    var canvas = el('hourlyPrecipChart'); if(!canvas) return;
+    if (hourlyChartInst) { hourlyChartInst.destroy(); hourlyChartInst = null; }
+    hourlyChartInst = new Chart(canvas.getContext('2d'), {
       data: {
-        labels: labels,
+        labels: list.map(function(h){ return h.time; }),
         datasets: [
-          {
-            type: 'line',
-            label: 'Rain Probability (%)',
-            data: rainProb,
-            borderColor: '#38bdf8',
-            backgroundColor: 'rgba(56, 189, 248, 0.15)',
-            borderWidth: 2,
-            tension: 0.35,
-            fill: true,
-            yAxisID: 'yProb',
-            pointRadius: 2,
-            pointHoverRadius: 5
-          },
-          {
-            type: 'bar',
-            label: 'Precipitation Volume (mm)',
-            data: rainVol,
-            backgroundColor: 'rgba(2, 132, 199, 0.7)',
-            borderColor: '#0284c7',
-            borderWidth: 1,
-            borderRadius: 4,
-            yAxisID: 'yPrecip'
-          }
+          { type:'line', label:'Probability (%)', data: list.map(function(h){ return h.precipProb; }),
+            borderColor:'#38bdf8', backgroundColor:'rgba(56,189,248,0.12)', borderWidth:2, fill:true,
+            tension:0.35, pointRadius:2, yAxisID:'yProb' },
+          { type:'bar', label:'Rain Vol (mm)', data: list.map(function(h){ return h.precipMm; }),
+            backgroundColor:'rgba(2,132,199,0.72)', borderColor:'#0284c7', borderWidth:1, borderRadius:4, yAxisID:'yMm' }
         ]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-          mode: 'index',
-          intersect: false
-        },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: 'rgba(15, 23, 42, 0.9)',
-            titleColor: '#fff',
-            bodyColor: '#38bdf8',
-            borderColor: 'rgba(56, 189, 248, 0.3)',
-            borderWidth: 1,
-            padding: 10,
-            cornerRadius: 8
-          }
-        },
-        scales: {
-          x: {
-            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-            ticks: { color: '#94a3b8', font: { size: 10 } }
-          },
-          yProb: {
-            type: 'linear',
-            position: 'left',
-            min: 0,
-            max: 100,
-            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-            ticks: {
-              color: '#38bdf8',
-              font: { size: 10 },
-              callback: val => `${val}%`
-            }
-          },
-          yPrecip: {
-            type: 'linear',
-            position: 'right',
-            min: 0,
-            grid: { drawOnChartArea: false },
-            ticks: {
-              color: '#0284c7',
-              font: { size: 10 },
-              callback: val => `${val}mm`
-            }
-          }
+        responsive:true, maintainAspectRatio:false,
+        interaction:{ mode:'index', intersect:false },
+        plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'rgba(15,23,42,0.9)', bodyColor:'#38bdf8', borderColor:'rgba(56,189,248,0.3)', borderWidth:1, padding:10, cornerRadius:8 } },
+        scales:{
+          x:{ grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#94a3b8',font:{size:10}} },
+          yProb:{ type:'linear', position:'left', min:0, max:100, grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#38bdf8',font:{size:10},callback:function(v){ return v+'%'; }} },
+          yMm:{ type:'linear', position:'right', min:0, grid:{drawOnChartArea:false}, ticks:{color:'#0284c7',font:{size:10},callback:function(v){ return v+'mm'; }} }
         }
       }
     });
   }
 
-  // 3. Render 7-Day Forecast Grid
-  function renderDailyForecast(dailyList) {
-    dailyForecastGrid.innerHTML = '';
-    dailyList.forEach(day => {
-      const card = document.createElement('div');
-      card.className = 'glass-card glass-card-interactive p-3 flex flex-col items-center justify-between text-center gap-2';
-      
-      const rainProbBadge = day.rainProbMax > 40
-        ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300"><i class="fa-solid fa-droplet text-[8px] mr-0.5"></i>${day.rainProbMax}%</span>`
-        : `<span class="text-[10px] text-slate-400 font-medium">${day.rainProbMax}% rain</span>`;
-
-      card.innerHTML = `
-        <span class="text-xs font-semibold text-slate-300">${day.dayName}</span>
-        <div class="text-2xl my-1">
-          ${getWeatherIconHtml(day.weather.icon, day.weather.condition)}
-        </div>
-        <div class="text-xs">
-          <span class="font-bold text-white">${Math.round(day.tempMax)}°</span>
-          <span class="text-slate-400 ml-1 font-light">${Math.round(day.tempMin)}°</span>
-        </div>
-        <div class="mt-1">
-          ${rainProbBadge}
-        </div>
-        <span class="text-[10px] text-cyan-400/90 font-medium">${day.rainSumMm} mm</span>
-      `;
-      dailyForecastGrid.appendChild(card);
+  function renderDailyForecast(daily) {
+    var grid = el('dailyForecastGrid'); if(!grid) return;
+    grid.innerHTML = '';
+    daily.forEach(function(d) {
+      var card = document.createElement('div');
+      card.className = 'glass-card glass-card-interactive p-3 flex flex-col items-center text-center gap-2 cursor-default';
+      var badge = d.rainProb > 40
+        ? '<span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300"><i class="fa-solid fa-droplet text-[8px] mr-0.5"></i>'+d.rainProb+'%</span>'
+        : '<span class="text-[10px] text-slate-400">'+d.rainProb+'% rain</span>';
+      card.innerHTML = '<span class="text-xs font-semibold text-slate-300">'+d.dayName+'</span>'
+        +'<div class="text-2xl my-1">'+wxIcon(d.meta.i).replace('text-3xl','text-2xl')+'</div>'
+        +'<div class="text-xs"><span class="font-bold text-white">'+Math.round(d.tempMax)+'°</span><span class="text-slate-400 ml-1">'+Math.round(d.tempMin)+'°</span></div>'
+        +badge
+        +'<span class="text-[10px] text-cyan-400">'+d.rainMm+' mm</span>';
+      grid.appendChild(card);
     });
   }
 
-  // 4. Render Eco & Hydration Advisory
-  function renderEcoAdvisory(eco, hydrationBoost) {
-    if (eco) {
-      gardenStatusText.textContent = eco.gardenAdvice;
-      const statusBox = document.getElementById('gardenStatusBox');
-      if (eco.gardenBadge === 'skip-watering') {
-        statusBox.className = 'p-4 rounded-xl bg-sky-950/50 border border-sky-400/40 text-sky-200 text-sm space-y-2';
-      } else {
-        statusBox.className = 'p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-200 text-sm space-y-2';
-      }
-    }
+  function renderAdvisory(boost, temp, gardenAdv, gardenCls) {
+    var box = el('gardenStatusBox');
+    if (box) { box.className = gardenCls; box.innerHTML = '<p id="gardenStatusText" class="text-sm"></p>'; }
+    setText('gardenStatusText', '');
+    setHTML('gardenStatusText', gardenAdv);
 
-    if (hydrationBoost) {
-      if (hydrationBoost.recommendedExtraWater > 0) {
-        advisoryBadge.textContent = `+${hydrationBoost.recommendedExtraWater} ml Boost`;
-        advisoryBadge.className = 'text-xs font-semibold px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded-md';
-        advisoryText.textContent = `${hydrationBoost.reason} We recommend drinking an extra +${hydrationBoost.recommendedExtraWater} ml today.`;
-      } else {
-        advisoryBadge.textContent = 'Standard';
-        advisoryBadge.className = 'text-xs font-semibold px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-md';
-        advisoryText.textContent = 'Weather is moderate. Standard daily hydration target is sufficient.';
-      }
-    }
-  }
-
-  // Apply Weather Hydration Boost
-  applyHydrationBoostBtn.addEventListener('click', async () => {
-    if (state.recommendedExtraWater > 0) {
-      const newTarget = (state.hydrationData.settings.baseTarget || 2500) + state.recommendedExtraWater;
-      await updateTarget(newTarget, state.hydrationData.settings.weight);
-      showToast(`Target adjusted to ${newTarget} ml based on current temperature!`, 'success');
+    if (boost > 0) {
+      setText('advisoryBadge', '+'+boost+' ml Boost');
+      var b = el('advisoryBadge'); if(b) b.className='text-xs font-semibold px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded-md';
+      setText('advisoryText', (temp>28?'High temp requires more fluids.':'Hot & dry weather detected.') + ' Drink an extra +'+boost+' ml today.');
     } else {
-      showToast('Standard water target is already ideal for current weather.', 'info');
+      setText('advisoryBadge','Standard');
+      var b2 = el('advisoryBadge'); if(b2) b2.className='text-xs font-semibold px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-md';
+      setText('advisoryText','Weather is moderate. Your standard daily hydration target is sufficient.');
     }
-  });
-
-  // 5. Hydration App Logic (LocalStorage persistence)
-  function getLocalHydrationData() {
-    try {
-      const raw = localStorage.getItem('aquacast_hydration_v1');
-      if (raw) return JSON.parse(raw);
-    } catch (e) {}
-    return { logs: [], settings: { baseTarget: 2500, weight: 70 } };
   }
 
-  function saveLocalHydrationData(data) {
-    try {
-      localStorage.setItem('aquacast_hydration_v1', JSON.stringify(data));
-    } catch (e) {}
+  function getLocal() {
+    try{ var r=localStorage.getItem('aquacast_v2'); if(r) return JSON.parse(r); }catch(e){}
+    return { logs:[], settings:{ baseTarget:2500, weight:70 } };
   }
+  function saveLocal(d){ try{ localStorage.setItem('aquacast_v2',JSON.stringify(d)); }catch(e){} }
 
-  function fetchHydration() {
-    const local = getLocalHydrationData();
-    const today = new Date().toISOString().split('T')[0];
-    const todayLogs = local.logs.filter(l => l.date === today);
-    const totalDrank = todayLogs.reduce((acc, item) => acc + item.amount, 0);
-    const target = local.settings.baseTarget || 2500;
+  function loadHydration() {
+    var local  = getLocal();
+    var today  = new Date().toISOString().split('T')[0];
+    var logs   = local.logs.filter(function(l){ return l.date===today; });
+    var total  = logs.reduce(function(a,l){ return a+l.amount; },0);
+    var target = local.settings.baseTarget || 2500;
+    var pct    = Math.min(100, Math.round((total/target)*100));
+    var rem    = Math.max(0, target-total);
 
-    const data = {
-      date: today,
-      target,
-      totalDrank,
-      remaining: Math.max(0, target - totalDrank),
-      percentage: Math.min(100, Math.round((totalDrank / target) * 100)),
-      logs: todayLogs,
-      settings: local.settings
-    };
+    setText('hydrationPctText', pct+'%');
+    setText('intakeValue', total);
+    setText('targetValue', target);
+    setText('tankRemaining', rem>0 ? rem+' ml to go' : '🎉 Goal Achieved!');
+    var tank = el('waterTankInner');
+    if(tank) tank.style.height = Math.min(100,Math.max(0,pct))+'%';
+    setText('logCountBadge', logs.length+' drink'+(logs.length===1?'':'s'));
 
-    state.hydrationData = data;
-    renderHydrationUI();
-  }
-
-  function renderHydrationUI() {
-    const { totalDrank, target, percentage, remaining, logs, settings } = state.hydrationData;
-
-    hydrationPctText.textContent = `${percentage}%`;
-    intakeValue.textContent = totalDrank;
-    targetValue.textContent = target;
-    tankRemaining.textContent = remaining > 0 ? `${remaining} ml to go` : '🎉 Goal Achieved!';
-    
-    // Wave Tank fill height (cap between 0% and 100%)
-    waterTankInner.style.height = `${Math.min(100, Math.max(0, percentage))}%`;
-
-    // Render Timeline
-    logCountBadge.textContent = `${logs.length} drink${logs.length === 1 ? '' : 's'}`;
-    if (logs.length === 0) {
-      todayLogsList.innerHTML = '<p class="text-sm text-slate-400 italic py-4 text-center">No water logged yet today. Take a sip and track your first glass!</p>';
-    } else {
-      todayLogsList.innerHTML = '';
-      [...logs].reverse().forEach(item => {
-        const row = document.createElement('div');
-        row.className = 'flex items-center justify-between p-2.5 rounded-xl bg-slate-800/40 border border-white/5 text-xs';
-        row.innerHTML = `
-          <div class="flex items-center gap-2.5">
-            <span class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center">
-              <i class="fa-solid fa-glass-water"></i>
-            </span>
-            <div>
-              <span class="font-bold text-white block">+${item.amount} ml</span>
-              <span class="text-[10px] text-slate-400">${item.type || 'Water'}</span>
-            </div>
-          </div>
-          <span class="text-slate-400 text-[11px] font-medium">${item.time}</span>
-        `;
-        todayLogsList.appendChild(row);
-      });
-    }
-
-    // Trigger celebration confetti if goal achieved
-    if (percentage >= 100 && percentage - (logs[logs.length-1]?.amount / target * 100) < 100) {
-      if (typeof confetti === 'function') {
-        confetti({
-          particleCount: 80,
-          spread: 70,
-          origin: { y: 0.6 }
+    var list = el('todayLogsList');
+    if(list) {
+      if(logs.length===0) {
+        list.innerHTML='<p class="text-sm text-slate-400 italic py-4 text-center">No water logged yet today.</p>';
+      } else {
+        list.innerHTML='';
+        var rev = logs.slice().reverse();
+        rev.forEach(function(item) {
+          var row=document.createElement('div');
+          row.className='flex items-center justify-between p-2.5 rounded-xl bg-slate-800/40 border border-white/5 text-xs';
+          row.innerHTML='<div class="flex items-center gap-2.5"><span class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center"><i class="fa-solid fa-glass-water"></i></span>'
+            +'<div><span class="font-bold text-white block">+'+item.amount+' ml</span><span class="text-[10px] text-slate-400">Water</span></div></div>'
+            +'<span class="text-slate-400 text-[11px]">'+item.time+'</span>';
+          list.appendChild(row);
         });
       }
     }
+    if(pct>=100 && typeof confetti==='function') confetti({particleCount:60,spread:55,origin:{y:0.6}});
+    loadWeeklyHistory();
   }
-
-  // Quick Add Buttons
-  document.querySelectorAll('.btn-quick-add').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const amount = parseInt(btn.dataset.amount, 10);
-      logWater(amount);
-    });
-  });
-
-  // Custom Amount Form
-  customLogForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const amount = parseInt(customAmountInput.value, 10);
-    if (amount > 0) {
-      logWater(amount);
-      customAmountInput.value = '';
-    }
-  });
 
   function logWater(amount) {
-    try {
-      playWaterDropSound();
-      const local = getLocalHydrationData();
-      const now = new Date();
-      const today = now.toISOString().split('T')[0];
-      const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    playDrop();
+    var local = getLocal();
+    var now   = new Date();
+    local.logs.push({ id:Date.now(), date:now.toISOString().split('T')[0], time:now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}), amount:amount });
+    saveLocal(local);
+    loadHydration();
+    toast('+'+amount+' ml logged! Keep it up 💧','success');
+  }
 
-      local.logs.push({
-        id: Date.now().toString(),
-        date: today,
-        time,
-        timestamp: now.toISOString(),
-        amount: amount,
-        type: 'Water'
-      });
-      saveLocalHydrationData(local);
-
-      fetchHydration();
-      fetchWeeklyHistory();
-      showToast(`+${amount} ml logged! Keep it up 💧`, 'success');
-    } catch (err) {
-      console.error(err);
-      showToast('Error logging water', 'error');
+  function loadWeeklyHistory() {
+    var local = getLocal();
+    var hist  = {};
+    var today = new Date();
+    for (var i=6; i>=0; i--) {
+      var d=new Date(today); d.setDate(d.getDate()-i);
+      var ds=d.toISOString().split('T')[0];
+      hist[ds]={ day:d.toLocaleDateString('en-US',{weekday:'short'}), total:0, target:local.settings.baseTarget||2500 };
     }
-  }
+    local.logs.forEach(function(l){ if(hist[l.date]) hist[l.date].total+=l.amount; });
+    var arr = Object.values(hist);
 
-  // Reset Today
-  resetTodayBtn.addEventListener('click', () => {
-    if (confirm('Are you sure you want to reset today\'s water intake logs?')) {
-      const local = getLocalHydrationData();
-      const today = new Date().toISOString().split('T')[0];
-      local.logs = local.logs.filter(l => l.date !== today);
-      saveLocalHydrationData(local);
-      fetchHydration();
-      fetchWeeklyHistory();
-      showToast('Hydration log reset for today', 'info');
-    }
-  });
+    var totalMl = arr.reduce(function(s,h){ return s+h.total; },0);
+    var avg     = Math.round(totalMl/arr.length);
+    var met     = arr.filter(function(h){ return h.total>=h.target && h.target>0; }).length;
+    setText('statWeeklyTotal', (totalMl/1000).toFixed(1)+' L');
+    setText('statDailyAvg', avg+' ml');
+    setText('statGoalRate', Math.round((met/arr.length)*100)+'%');
 
-  // Target Settings Modal
-  openTargetModalBtn.addEventListener('click', () => {
-    baseTargetInput.value = state.hydrationData.target || 2500;
-    weightInput.value = state.hydrationData.settings?.weight || 70;
-    targetModal.classList.remove('hidden');
-    targetModal.classList.add('flex');
-  });
-
-  function closeTargetModal() {
-    targetModal.classList.add('hidden');
-    targetModal.classList.remove('flex');
-  }
-
-  closeTargetModalBtn.addEventListener('click', closeTargetModal);
-  cancelTargetBtn.addEventListener('click', closeTargetModal);
-
-  targetForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const baseTarget = parseInt(baseTargetInput.value, 10);
-    const weight = parseInt(weightInput.value, 10);
-    updateTarget(baseTarget, weight);
-    closeTargetModal();
-    showToast('Water target updated successfully!', 'success');
-  });
-
-  function updateTarget(baseTarget, weight) {
-    const local = getLocalHydrationData();
-    if (baseTarget) local.settings.baseTarget = baseTarget;
-    if (weight) local.settings.weight = weight;
-    saveLocalHydrationData(local);
-    fetchHydration();
-  }
-
-  // 6. Rain Harvesting Calculator
-  function calculateRainHarvest() {
-    const area = parseFloat(roofAreaInput.value) || 0;
-    const rainfall = parseFloat(rainfallInput.value) || 0;
-    const runoff = 0.85;
-
-    const liters = Math.round(area * rainfall * runoff);
-    const gallons = Math.round(liters * 0.264172);
-
-    harvestLiters.textContent = liters.toLocaleString();
-    harvestGallons.textContent = `(~${gallons.toLocaleString()} Gallons)`;
-
-    flushCount.textContent = Math.floor(liters / 6).toLocaleString();
-    showerMinutes.textContent = Math.floor(liters / 9).toLocaleString();
-    gardenDays.textContent = Math.round(liters / 15).toLocaleString();
-  }
-
-  roofAreaInput.addEventListener('input', calculateRainHarvest);
-  rainfallInput.addEventListener('input', calculateRainHarvest);
-
-  useForecastRainBtn.addEventListener('click', () => {
-    if (state.weatherData?.daily) {
-      const totalWeekRain = state.weatherData.daily.reduce((acc, curr) => acc + curr.rainSumMm, 0);
-      rainfallInput.value = totalWeekRain > 0 ? parseFloat(totalWeekRain.toFixed(1)) : 15;
-      calculateRainHarvest();
-      showToast(`Set rainfall to ${rainfallInput.value} mm from 7-day forecast`, 'info');
-    }
-  });
-
-  // 7. Weekly History & Analytics Chart
-  function fetchWeeklyHistory() {
-    const local = getLocalHydrationData();
-    const histObj = {};
-    const today = new Date();
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().split('T')[0];
-      const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
-      histObj[dateStr] = { date: dateStr, day: dayName, total: 0, target: local.settings.baseTarget || 2500 };
-    }
-    local.logs.forEach(log => {
-      if (histObj[log.date]) histObj[log.date].total += log.amount;
-    });
-    const history = Object.values(histObj);
-
-    state.weeklyHistory = history;
-    renderWeeklyAnalyticsStats();
-  }
-
-  function renderWeeklyAnalyticsStats() {
-    const history = state.weeklyHistory;
-    if (!history || history.length === 0) return;
-
-    const totalMl = history.reduce((sum, item) => sum + item.total, 0);
-    const avgMl = Math.round(totalMl / history.length);
-    const daysMet = history.filter(item => item.total >= item.target && item.target > 0).length;
-    const completionRate = Math.round((daysMet / history.length) * 100);
-
-    statWeeklyTotal.textContent = `${(totalMl / 1000).toFixed(1)} L`;
-    statDailyAvg.textContent = `${avgMl} ml`;
-    statGoalRate.textContent = `${completionRate}%`;
-  }
-
-  function renderWeeklyHydrationChart() {
-    const ctx = document.getElementById('weeklyHydrationChart').getContext('2d');
-    const history = state.weeklyHistory;
-    if (!history || history.length === 0) return;
-
-    const labels = history.map(h => h.day);
-    const values = history.map(h => h.total);
-    const targets = history.map(h => h.target);
-
-    if (weeklyHydrationChartInstance) {
-      weeklyHydrationChartInstance.destroy();
-    }
-
-    weeklyHydrationChartInstance = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            type: 'line',
-            label: 'Daily Target (ml)',
-            data: targets,
-            borderColor: '#f87171',
-            borderWidth: 2,
-            borderDash: [5, 5],
-            pointRadius: 0,
-            fill: false
-          },
-          {
-            type: 'bar',
-            label: 'Water Intake (ml)',
-            data: values,
-            backgroundColor: values.map(v => v >= 2500 ? 'rgba(56, 189, 248, 0.85)' : 'rgba(2, 132, 199, 0.7)'),
-            borderColor: '#38bdf8',
-            borderWidth: 1,
-            borderRadius: 6
-          }
+    var canvas = el('weeklyHydrationChart');
+    if(!canvas) return;
+    if(weeklyChartInst){ weeklyChartInst.destroy(); weeklyChartInst=null; }
+    weeklyChartInst = new Chart(canvas.getContext('2d'), {
+      data:{
+        labels: arr.map(function(h){ return h.day; }),
+        datasets:[
+          { type:'line', label:'Target (ml)', data:arr.map(function(h){ return h.target; }),
+            borderColor:'#f87171', borderWidth:2, borderDash:[5,5], pointRadius:0, fill:false },
+          { type:'bar', label:'Intake (ml)', data:arr.map(function(h){ return h.total; }),
+            backgroundColor: arr.map(function(h){ return h.total>=h.target?'rgba(56,189,248,0.85)':'rgba(2,132,199,0.7)'; }),
+            borderColor:'#38bdf8', borderWidth:1, borderRadius:6 }
         ]
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: 'rgba(15, 23, 42, 0.9)',
-            titleColor: '#fff',
-            bodyColor: '#38bdf8',
-            borderColor: 'rgba(56, 189, 248, 0.3)',
-            borderWidth: 1,
-            padding: 10,
-            cornerRadius: 8
-          }
-        },
-        scales: {
-          x: {
-            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-            ticks: { color: '#94a3b8' }
-          },
-          y: {
-            beginAtZero: true,
-            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-            ticks: {
-              color: '#94a3b8',
-              callback: val => `${val}ml`
-            }
-          }
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'rgba(15,23,42,0.9)',bodyColor:'#38bdf8',borderColor:'rgba(56,189,248,0.3)',borderWidth:1,padding:10,cornerRadius:8 } },
+        scales:{
+          x:{ grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#94a3b8'} },
+          y:{ beginAtZero:true, grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#94a3b8',callback:function(v){ return v+'ml'; }} }
         }
       }
     });
   }
 
-  // 8. City Search & Geocoding Autocomplete (Direct Open-Meteo Geocoding)
-  let searchTimeout = null;
-  cityInput.addEventListener('input', (e) => {
-    const val = e.target.value.trim();
-    clearSearchBtn.classList.toggle('hidden', val.length === 0);
+  function calcHarvest() {
+    var area = parseFloat((el('roofAreaInput')||{}).value)||0;
+    var rain = parseFloat((el('rainfallInput')||{}).value)||0;
+    var lit  = Math.round(area * rain * 0.85);
+    var gal  = Math.round(lit * 0.264172);
+    setText('harvestLiters', lit.toLocaleString());
+    setText('harvestGallons', '(~'+gal.toLocaleString()+' Gallons)');
+    setText('flushCount', Math.floor(lit/6).toLocaleString());
+    setText('showerMinutes', Math.floor(lit/9).toLocaleString());
+    setText('gardenDays', Math.round(lit/15).toLocaleString());
+  }
 
-    clearTimeout(searchTimeout);
-    if (val.length < 2) {
-      searchResults.classList.add('hidden');
-      return;
-    }
+  var searchTimer = null;
+  function bindSearch() {
+    var inp = el('cityInput'), res = el('searchResults'), clr = el('clearSearchBtn');
+    if (!inp) return;
+    inp.addEventListener('input', function() {
+      var v = inp.value.trim();
+      if(clr) clr.classList.toggle('hidden', v.length===0);
+      clearTimeout(searchTimer);
+      if(v.length<2){ if(res) res.classList.add('hidden'); return; }
+      searchTimer = setTimeout(function() {
+        var gurl = 'https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(v)+'&count=6&language=en&format=json';
+        fetch(gurl)
+          .then(function(r){ return r.json(); })
+          .then(function(data) {
+            if(!res) return;
+            var items = data.results || [];
+            if(items.length===0){
+              res.innerHTML='<div class="p-3 text-xs text-slate-400">No matching cities found</div>';
+            } else {
+              res.innerHTML='';
+              items.forEach(function(item) {
+                var opt=document.createElement('div');
+                opt.className='p-2.5 hover:bg-sky-600/30 cursor-pointer text-xs border-b border-white/5 flex items-center justify-between';
+                var loc=[item.name,item.admin1,item.country].filter(Boolean).join(', ');
+                opt.innerHTML='<span class="font-medium text-white">'+loc+'</span><span class="text-[10px] text-sky-400">'+(item.country_code||'')+'</span>';
+                opt.addEventListener('click', function(){
+                  inp.value=item.name;
+                  res.classList.add('hidden');
+                  if(clr) clr.classList.add('hidden');
+                  fetchWeather(item.latitude, item.longitude, item.name);
+                });
+                res.appendChild(opt);
+              });
+            }
+            res.classList.remove('hidden');
+          })
+          .catch(function(e){ console.error(e); });
+      }, 300);
+    });
+    if(clr) clr.addEventListener('click', function(){ inp.value=''; clr.classList.add('hidden'); if(res) res.classList.add('hidden'); });
+    document.addEventListener('click', function(e){ if(res && !inp.contains(e.target) && !res.contains(e.target)) res.classList.add('hidden'); });
+  }
 
-    searchTimeout = setTimeout(async () => {
-      try {
-        const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(val)}&count=6&language=en&format=json`;
-        const res = await fetch(geoUrl);
-        const data = await res.json();
-        const results = (data.results || []).map(item => ({
-          id: item.id,
-          name: item.name,
-          admin1: item.admin1 || '',
-          country: item.country || '',
-          countryCode: item.country_code || '',
-          latitude: item.latitude,
-          longitude: item.longitude
-        }));
+  function bindTabs() {
+    var tabs = document.querySelectorAll('.nav-tab');
+    var sections = document.querySelectorAll('.tab-content');
+    tabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        tabs.forEach(function(t){
+          t.classList.remove('bg-sky-500/20','text-sky-300','border-sky-400/40');
+          t.classList.add('text-slate-400','border-transparent');
+        });
+        tab.classList.add('bg-sky-500/20','text-sky-300','border-sky-400/40');
+        tab.classList.remove('text-slate-400','border-transparent');
+        var target = tab.dataset.tab;
+        sections.forEach(function(s){ s.classList.remove('active'); s.style.display='none'; });
+        var sec = el('tab-'+target);
+        if(sec){ sec.classList.add('active'); sec.style.display='block'; }
+        if(target==='analytics') loadWeeklyHistory();
+      });
+    });
+    var first = el('tab-forecast');
+    if(first) first.style.display='block';
+  }
 
-        if (results.length === 0) {
-          searchResults.innerHTML = '<div class="p-3 text-xs text-slate-400">No matching cities found</div>';
-        } else {
-          searchResults.innerHTML = '';
-          results.forEach(item => {
-            const opt = document.createElement('div');
-            opt.className = 'p-2.5 hover:bg-sky-600/30 cursor-pointer text-xs border-b border-white/5 flex items-center justify-between';
-            const locationStr = [item.name, item.admin1, item.country].filter(Boolean).join(', ');
-            opt.innerHTML = `
-              <span class="font-medium text-white">${locationStr}</span>
-              <span class="text-[10px] text-sky-400">${item.countryCode}</span>
-            `;
-            opt.addEventListener('click', () => {
-              cityInput.value = item.name;
-              searchResults.classList.add('hidden');
-              fetchWeather(item.latitude, item.longitude, item.name);
-            });
-            searchResults.appendChild(opt);
-          });
-        }
-        searchResults.classList.remove('hidden');
-      } catch (err) {
-        console.error(err);
+  function bindModal() {
+    var modal=el('targetModal'), openBtn=el('openTargetModalBtn'), closeBtn=el('closeTargetModalBtn'), cancelBtn=el('cancelTargetBtn'), form=el('targetForm');
+    function open(){ if(modal){ modal.style.display='flex'; modal.classList.remove('hidden'); var local=getLocal(); var ti=el('baseTargetInput'),wi=el('weightInput'); if(ti) ti.value=local.settings.baseTarget||2500; if(wi) wi.value=local.settings.weight||70; } }
+    function close(){ if(modal){ modal.style.display='none'; modal.classList.add('hidden'); } }
+    if(openBtn) openBtn.addEventListener('click', open);
+    if(closeBtn) closeBtn.addEventListener('click', close);
+    if(cancelBtn) cancelBtn.addEventListener('click', close);
+    if(form) form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var local=getLocal();
+      var ti=el('baseTargetInput'), wi=el('weightInput');
+      if(ti && ti.value) local.settings.baseTarget=parseInt(ti.value,10);
+      if(wi && wi.value) local.settings.weight=parseInt(wi.value,10);
+      saveLocal(local);
+      loadHydration();
+      close();
+      toast('Water target updated!','success');
+    });
+  }
+
+  function bindQuickLog() {
+    document.querySelectorAll('.btn-quick-add').forEach(function(btn){
+      btn.addEventListener('click', function(){ logWater(parseInt(btn.dataset.amount,10)); });
+    });
+    var form=el('customLogForm'), inp=el('customAmountInput');
+    if(form) form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var v=parseInt(inp.value,10);
+      if(v>0){ logWater(v); inp.value=''; }
+    });
+    var reset=el('resetTodayBtn');
+    if(reset) reset.addEventListener('click', function(){
+      if(!confirm("Reset today's water logs?")) return;
+      var local=getLocal(), today=new Date().toISOString().split('T')[0];
+      local.logs=local.logs.filter(function(l){ return l.date!==today; });
+      saveLocal(local); loadHydration();
+      toast("Today's log reset","info");
+    });
+  }
+
+  function bindBoost() {
+    var btn=el('applyHydrationBoostBtn');
+    if(!btn) return;
+    btn.addEventListener('click', function(){
+      var local=getLocal();
+      var extra=state.recommendedExtraWater;
+      if(extra>0){
+        local.settings.baseTarget=(local.settings.baseTarget||2500)+extra;
+        saveLocal(local); loadHydration();
+        toast('Target bumped to '+local.settings.baseTarget+' ml based on weather!','success');
+      } else {
+        toast('Standard target is already optimal for current weather.','info');
       }
-    }, 280);
-  });
+    });
+  }
 
-  clearSearchBtn.addEventListener('click', () => {
-    cityInput.value = '';
-    clearSearchBtn.classList.add('hidden');
-    searchResults.classList.add('hidden');
-  });
+  function bindHarvest() {
+    var ri=el('roofAreaInput'), rf=el('rainfallInput'), ubtn=el('useForecastRainBtn');
+    if(ri) ri.addEventListener('input', calcHarvest);
+    if(rf) rf.addEventListener('input', calcHarvest);
+    if(ubtn) ubtn.addEventListener('click', function(){
+      if(!state.weatherData || !state.weatherData.daily) return;
+      var total=state.weatherData.daily.reduce(function(a,d){ return a+d.rainMm; },0);
+      if(rf) rf.value=total>0?parseFloat(total.toFixed(1)):15;
+      calcHarvest();
+      toast('Rainfall set to '+rf.value+' mm from 7-day forecast','info');
+    });
+  }
 
-  document.addEventListener('click', (e) => {
-    if (!cityInput.contains(e.target) && !searchResults.contains(e.target)) {
-      searchResults.classList.add('hidden');
-    }
-  });
+  function bindGeo() {
+    var btn=el('geoBtn');
+    if(!btn) return;
+    btn.addEventListener('click', function(){
+      if(!navigator.geolocation){ toast('Geolocation not supported','error'); return; }
+      toast('Getting your location...','info');
+      navigator.geolocation.getCurrentPosition(
+        function(pos){ fetchWeather(pos.coords.latitude, pos.coords.longitude, 'My Location'); },
+        function(){ toast('Location permission denied','error'); }
+      );
+    });
+  }
 
-  // Geolocation Button
-  geoBtn.addEventListener('click', () => {
-    if (!navigator.geolocation) {
-      showToast('Geolocation not supported by browser', 'error');
-      return;
-    }
-    showToast('Getting device coordinates...', 'info');
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        fetchWeather(latitude, longitude, 'My Location');
-      },
-      (err) => {
-        console.error(err);
-        showToast('Location permission denied or unavailable', 'error');
-      }
-    );
-  });
+  function init() {
+    bindTabs();
+    bindSearch();
+    bindQuickLog();
+    bindModal();
+    bindBoost();
+    bindHarvest();
+    bindGeo();
+    fetchWeather(state.lat, state.lon, state.city);
+    loadHydration();
+    calcHarvest();
+  }
 
-  // Initial Load
-  fetchWeather(state.lat, state.lon, state.city);
-  fetchHydration();
-  fetchWeeklyHistory();
-  calculateRainHarvest();
-}
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initAquaCast);
-} else {
-  initAquaCast();
-}
+})();
 </script>
 </body>
 </html>
