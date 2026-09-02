@@ -651,7 +651,7 @@ body {
   <!-- App Script -->
   <script>
 // AquaCast Frontend Core Controller
-document.addEventListener('DOMContentLoaded', () => {
+function initAquaCast() {
   // State
   let state = {
     city: 'New York',
@@ -1513,7 +1513,13 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchHydration();
   fetchWeeklyHistory();
   calculateRainHarvest();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAquaCast);
+} else {
+  initAquaCast();
+}
 
 </script>
 </body>
