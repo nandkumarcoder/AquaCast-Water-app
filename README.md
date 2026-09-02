@@ -3,7 +3,7 @@
 AquaCast is a modern full-stack web application combining real-time precipitation and weather forecasting with a smart, weather-adaptive hydration tracker and rainwater harvesting calculator.
 
 ## 🚀 Live Demo
-- **GitHub Pages**: https://nandkumarcoder.github.io/aquacast-water-app/
+- **GitHub Pages**:  https://nandkumarcoder.github.io/AquaCast-Water-app/
 
 ---
 
