@@ -1,4 +1,4 @@
-﻿// AquaCast Frontend Core Controller
+// AquaCast Frontend Core Controller
 document.addEventListener('DOMContentLoaded', () => {
   // State
   let state = {
@@ -177,21 +177,105 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 1. Fetch & Render Weather
+  // 1. Fetch & Render Weather (Direct Open-Meteo API)
   async function fetchWeather(lat, lon, cityName) {
     try {
       locationTitle.textContent = cityName || 'Updating...';
       weatherSummary.textContent = 'Fetching precipitation and atmospheric metrics...';
 
-      const res = await fetch(`/api/weather?lat=${lat}&lon=${lon}&city=${encodeURIComponent(cityName || '')}`);
+      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,surface_pressure&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,uv_index_max&timezone=auto`;
+      const res = await fetch(weatherUrl);
       if (!res.ok) throw new Error('Could not fetch weather data');
       
-      const data = await res.json();
+      const raw = await res.json();
+      const currentCode = raw.current?.weather_code ?? 0;
+      const currentMeta = getWeatherMeta(currentCode);
+      const temp = raw.current?.temperature_2m ?? 24;
+      const humidity = raw.current?.relative_humidity_2m ?? 50;
+
+      let weatherExtraWater = 0;
+      if (temp > 22) weatherExtraWater += Math.round(((temp - 22) / 5) * 200);
+      if (humidity < 40) weatherExtraWater += 150;
+
+      const currentHourIndex = new Date().getHours();
+      const next24Hours = [];
+      const hourlyTimes = raw.hourly?.time || [];
+      const hourlyPrecip = raw.hourly?.precipitation || [];
+      const hourlyProb = raw.hourly?.precipitation_probability || [];
+      const hourlyTemp = raw.hourly?.temperature_2m || [];
+      const hourlyCodes = raw.hourly?.weather_code || [];
+
+      for (let i = 0; i < Math.min(24, hourlyTimes.length); i++) {
+        const idx = (currentHourIndex + i) % hourlyTimes.length;
+        const timeStr = hourlyTimes[idx] || '';
+        const hour = timeStr ? new Date(timeStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : `+${i}h`;
+        next24Hours.push({
+          time: hour,
+          temp: hourlyTemp[idx] ?? 0,
+          precipMm: hourlyPrecip[idx] ?? 0,
+          precipProb: hourlyProb[idx] ?? 0,
+          weather: getWeatherMeta(hourlyCodes[idx] ?? 0)
+        });
+      }
+
+      const dailyForecast = [];
+      const dailyTimes = raw.daily?.time || [];
+      const dailyMax = raw.daily?.temperature_2m_max || [];
+      const dailyMin = raw.daily?.temperature_2m_min || [];
+      const dailyRain = raw.daily?.precipitation_sum || [];
+      const dailyRainProb = raw.daily?.precipitation_probability_max || [];
+      const dailyCodes = raw.daily?.weather_code || [];
+
+      for (let i = 0; i < dailyTimes.length; i++) {
+        const dateObj = new Date(dailyTimes[i]);
+        const dayName = i === 0 ? 'Today' : dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        dailyForecast.push({
+          date: dailyTimes[i],
+          dayName,
+          tempMax: dailyMax[i] ?? 0,
+          tempMin: dailyMin[i] ?? 0,
+          rainSumMm: dailyRain[i] ?? 0,
+          rainProbMax: dailyRainProb[i] ?? 0,
+          weather: getWeatherMeta(dailyCodes[i] ?? 0)
+        });
+      }
+
+      const totalRainNext3Days = dailyForecast.slice(0, 3).reduce((acc, curr) => acc + curr.rainSumMm, 0);
+      const rainProbToday = dailyForecast[0]?.rainProbMax || 0;
+      let gardenAdvice = "Normal watering needed today.";
+      let gardenBadge = "water-ok";
+      if (rainProbToday > 60 || totalRainNext3Days > 10) {
+        gardenAdvice = "🌧️ High rain expected! Skip outdoor garden watering to save water.";
+        gardenBadge = "skip-watering";
+      } else if (temp > 32 && rainProbToday < 20) {
+        gardenAdvice = "☀️ Hot & dry conditions. Water plants early morning or evening to prevent evaporation.";
+        gardenBadge = "water-early";
+      }
+
+      const data = {
+        location: { city: cityName || 'Selected Location' },
+        current: {
+          temp,
+          apparentTemp: raw.current?.apparent_temperature ?? temp,
+          humidity,
+          windSpeed: raw.current?.wind_speed_10m ?? 0,
+          precipitationMm: raw.current?.rain ?? raw.current?.precipitation ?? 0,
+          weather: currentMeta
+        },
+        hydrationBoost: {
+          recommendedExtraWater: weatherExtraWater,
+          reason: temp > 28 ? 'High ambient temperature requires increased fluid intake.' : 'Standard hydration weather.'
+        },
+        ecoAdvisory: { gardenAdvice, gardenBadge },
+        hourly: next24Hours,
+        daily: dailyForecast
+      };
+
       state.weatherData = data;
       state.lat = lat;
       state.lon = lon;
-      state.city = data.location.city || cityName;
-      state.recommendedExtraWater = data.hydrationBoost?.recommendedExtraWater || 0;
+      state.city = cityName;
+      state.recommendedExtraWater = weatherExtraWater;
 
       renderWeatherOverview(data);
       renderHourlyPrecipChart(data.hourly || []);
@@ -376,17 +460,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 5. Hydration App Logic
-  async function fetchHydration() {
+  // 5. Hydration App Logic (LocalStorage persistence)
+  function getLocalHydrationData() {
     try {
-      const res = await fetch('/api/hydration');
-      if (!res.ok) throw new Error('Failed to fetch hydration');
-      const data = await res.json();
-      state.hydrationData = data;
-      renderHydrationUI();
-    } catch (err) {
-      console.error(err);
-    }
+      const raw = localStorage.getItem('aquacast_hydration_v1');
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return { logs: [], settings: { baseTarget: 2500, weight: 70 } };
+  }
+
+  function saveLocalHydrationData(data) {
+    try {
+      localStorage.setItem('aquacast_hydration_v1', JSON.stringify(data));
+    } catch (e) {}
+  }
+
+  function fetchHydration() {
+    const local = getLocalHydrationData();
+    const today = new Date().toISOString().split('T')[0];
+    const todayLogs = local.logs.filter(l => l.date === today);
+    const totalDrank = todayLogs.reduce((acc, item) => acc + item.amount, 0);
+    const target = local.settings.baseTarget || 2500;
+
+    const data = {
+      date: today,
+      target,
+      totalDrank,
+      remaining: Math.max(0, target - totalDrank),
+      percentage: Math.min(100, Math.round((totalDrank / target) * 100)),
+      logs: todayLogs,
+      settings: local.settings
+    };
+
+    state.hydrationData = data;
+    renderHydrationUI();
   }
 
   function renderHydrationUI() {
@@ -455,19 +562,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  async function logWater(amount) {
+  function logWater(amount) {
     try {
       playWaterDropSound();
-      const res = await fetch('/api/hydration/log', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount, type: 'Water' })
+      const local = getLocalHydrationData();
+      const now = new Date();
+      const today = now.toISOString().split('T')[0];
+      const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      local.logs.push({
+        id: Date.now().toString(),
+        date: today,
+        time,
+        timestamp: now.toISOString(),
+        amount: amount,
+        type: 'Water'
       });
-      if (!res.ok) throw new Error('Could not log intake');
-      const data = await res.json();
-      
-      // Update local state and UI
-      await fetchHydration();
+      saveLocalHydrationData(local);
+
+      fetchHydration();
       fetchWeeklyHistory();
       showToast(`+${amount} ml logged! Keep it up 💧`, 'success');
     } catch (err) {
@@ -477,16 +590,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Reset Today
-  resetTodayBtn.addEventListener('click', async () => {
+  resetTodayBtn.addEventListener('click', () => {
     if (confirm('Are you sure you want to reset today\'s water intake logs?')) {
-      try {
-        await fetch('/api/hydration/reset', { method: 'DELETE' });
-        await fetchHydration();
-        fetchWeeklyHistory();
-        showToast('Hydration log reset for today', 'info');
-      } catch (err) {
-        console.error(err);
-      }
+      const local = getLocalHydrationData();
+      const today = new Date().toISOString().split('T')[0];
+      local.logs = local.logs.filter(l => l.date !== today);
+      saveLocalHydrationData(local);
+      fetchHydration();
+      fetchWeeklyHistory();
+      showToast('Hydration log reset for today', 'info');
     }
   });
 
@@ -506,28 +618,21 @@ document.addEventListener('DOMContentLoaded', () => {
   closeTargetModalBtn.addEventListener('click', closeTargetModal);
   cancelTargetBtn.addEventListener('click', closeTargetModal);
 
-  targetForm.addEventListener('submit', async (e) => {
+  targetForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const baseTarget = parseInt(baseTargetInput.value, 10);
     const weight = parseInt(weightInput.value, 10);
-    await updateTarget(baseTarget, weight);
+    updateTarget(baseTarget, weight);
     closeTargetModal();
     showToast('Water target updated successfully!', 'success');
   });
 
-  async function updateTarget(baseTarget, weight) {
-    try {
-      const res = await fetch('/api/hydration/target', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ baseTarget, weight })
-      });
-      if (res.ok) {
-        await fetchHydration();
-      }
-    } catch (err) {
-      console.error(err);
-    }
+  function updateTarget(baseTarget, weight) {
+    const local = getLocalHydrationData();
+    if (baseTarget) local.settings.baseTarget = baseTarget;
+    if (weight) local.settings.weight = weight;
+    saveLocalHydrationData(local);
+    fetchHydration();
   }
 
   // 6. Rain Harvesting Calculator
@@ -560,16 +665,24 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // 7. Weekly History & Analytics Chart
-  async function fetchWeeklyHistory() {
-    try {
-      const res = await fetch('/api/hydration/history');
-      if (!res.ok) return;
-      const data = await res.json();
-      state.weeklyHistory = data.history || [];
-      renderWeeklyAnalyticsStats();
-    } catch (err) {
-      console.error(err);
+  function fetchWeeklyHistory() {
+    const local = getLocalHydrationData();
+    const histObj = {};
+    const today = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+      histObj[dateStr] = { date: dateStr, day: dayName, total: 0, target: local.settings.baseTarget || 2500 };
     }
+    local.logs.forEach(log => {
+      if (histObj[log.date]) histObj[log.date].total += log.amount;
+    });
+    const history = Object.values(histObj);
+
+    state.weeklyHistory = history;
+    renderWeeklyAnalyticsStats();
   }
 
   function renderWeeklyAnalyticsStats() {
@@ -658,7 +771,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 8. City Search & Geocoding Autocomplete
+  // 8. City Search & Geocoding Autocomplete (Direct Open-Meteo Geocoding)
   let searchTimeout = null;
   cityInput.addEventListener('input', (e) => {
     const val = e.target.value.trim();
@@ -672,9 +785,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchTimeout = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(val)}`);
+        const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(val)}&count=6&language=en&format=json`;
+        const res = await fetch(geoUrl);
         const data = await res.json();
-        const results = data.results || [];
+        const results = (data.results || []).map(item => ({
+          id: item.id,
+          name: item.name,
+          admin1: item.admin1 || '',
+          country: item.country || '',
+          countryCode: item.country_code || '',
+          latitude: item.latitude,
+          longitude: item.longitude
+        }));
 
         if (results.length === 0) {
           searchResults.innerHTML = '<div class="p-3 text-xs text-slate-400">No matching cities found</div>';
