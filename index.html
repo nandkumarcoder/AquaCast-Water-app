@@ -1,0 +1,521 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AquaCast 💧 | Water & Weather Forecast + Hydration Companion</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Chart.js & Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="antialiased text-slate-100 flex flex-col min-h-screen">
+
+  <!-- Top Navigation / Header -->
+  <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-white/10 px-4 py-3">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-sky-500/30">
+          <i class="fa-solid fa-droplet text-white text-xl droplet-pulse"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-sky-200 to-cyan-300 bg-clip-text text-transparent">AquaCast</h1>
+          <p class="text-xs text-sky-300/80 font-medium">Water Forecast & Hydration Hub</p>
+        </div>
+      </div>
+
+      <!-- Search & Geolocation Bar -->
+      <div class="relative w-full sm:w-80 flex items-center">
+        <div class="relative w-full">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+          <input 
+            type="text" 
+            id="cityInput" 
+            placeholder="Search city (e.g. New York, London, Delhi)..." 
+            class="w-full pl-10 pr-10 py-2 bg-slate-800/80 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-500/20 transition-all shadow-inner"
+            autocomplete="off"
+          >
+          <button id="clearSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+            <i class="fa-solid fa-xmark text-xs"></i>
+          </button>
+          
+          <!-- Auto-complete Dropdown -->
+          <div id="searchResults" class="hidden absolute left-0 right-0 top-full mt-2 bg-slate-900/95 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50 max-h-60 overflow-y-auto">
+            <!-- Dynamic search results populated here -->
+          </div>
+        </div>
+
+        <!-- Geo Button -->
+        <button id="geoBtn" title="Use current location" class="ml-2 p-2 bg-slate-800/80 hover:bg-sky-600/30 border border-slate-700 hover:border-sky-500/50 rounded-xl text-sky-400 transition-all shadow-sm">
+          <i class="fa-solid fa-location-crosshairs text-base"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
+
+    <!-- Active Location & Weather Banner -->
+    <div class="glass-card p-4 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div id="weatherMainIcon" class="w-16 h-16 rounded-2xl bg-sky-500/10 border border-sky-400/20 flex items-center justify-center text-sky-400 text-3xl shadow-inner">
+          <i class="fa-solid fa-sun text-yellow-400"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 id="locationTitle" class="text-2xl font-bold text-white">Loading location...</h2>
+            <span id="liveBadge" class="px-2 py-0.5 text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full">LIVE</span>
+          </div>
+          <p id="weatherSummary" class="text-slate-300 text-sm mt-0.5">Fetching latest meteorological data...</p>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Ribbon -->
+      <div class="grid grid-cols-3 sm:grid-cols-4 gap-3 w-full md:w-auto">
+        <div class="bg-slate-800/60 border border-white/5 rounded-xl p-2.5 text-center">
+          <span class="text-xs text-slate-400 block"><i class="fa-solid fa-temperature-three-quarters mr-1 text-red-400"></i>Temp</span>
+          <span id="headerTemp" class="text-lg font-bold text-white">--°C</span>
+        </div>
+        <div class="bg-slate-800/60 border border-white/5 rounded-xl p-2.5 text-center">
+          <span class="text-xs text-slate-400 block"><i class="fa-solid fa-droplet mr-1 text-sky-400"></i>Humidity</span>
+          <span id="headerHumidity" class="text-lg font-bold text-sky-300">--%</span>
+        </div>
+        <div class="bg-slate-800/60 border border-white/5 rounded-xl p-2.5 text-center">
+          <span class="text-xs text-slate-400 block"><i class="fa-solid fa-cloud-showers-heavy mr-1 text-cyan-400"></i>Rain (1h)</span>
+          <span id="headerPrecip" class="text-lg font-bold text-cyan-300">-- mm</span>
+        </div>
+        <div class="bg-slate-800/60 border border-white/5 rounded-xl p-2.5 text-center col-span-3 sm:col-span-1">
+          <span class="text-xs text-slate-400 block"><i class="fa-solid fa-wind mr-1 text-teal-400"></i>Wind</span>
+          <span id="headerWind" class="text-lg font-bold text-teal-300">-- km/h</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex items-center justify-start sm:justify-center overflow-x-auto pb-1 gap-2 border-b border-white/10">
+      <button class="nav-tab active px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 bg-sky-500/20 text-sky-300 border border-sky-400/40 transition-all" data-tab="forecast">
+        <i class="fa-solid fa-cloud-sun-rain"></i> <span>Weather & Rain Forecast</span>
+      </button>
+      <button class="nav-tab px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 bg-transparent text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all" data-tab="hydration">
+        <i class="fa-solid fa-glass-water"></i> <span>Water Intake App</span>
+      </button>
+      <button class="nav-tab px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 bg-transparent text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all" data-tab="harvest">
+        <i class="fa-solid fa-hand-holding-droplet"></i> <span>Rain Harvest & Eco</span>
+      </button>
+      <button class="nav-tab px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 bg-transparent text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all" data-tab="analytics">
+        <i class="fa-solid fa-chart-line"></i> <span>Water Insights</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: WEATHER & RAIN FORECAST -->
+    <section id="tab-forecast" class="tab-content space-y-6">
+      
+      <!-- Hourly Rain & Precipitation Chart Card -->
+      <div class="glass-card p-5 sm:p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-chart-simple text-sky-400"></i>
+              <span>Next 24-Hour Precipitation & Rain Probability</span>
+            </h3>
+            <p class="text-xs text-slate-400">Hourly forecast of rain probability (%) and precipitation volume (mm)</p>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="inline-flex items-center gap-1 text-sky-400 font-medium"><span class="w-3 h-3 bg-sky-500 rounded-sm"></span> Rain Vol (mm)</span>
+            <span class="inline-flex items-center gap-1 text-cyan-300 font-medium"><span class="w-3 h-1 bg-cyan-300 rounded-full"></span> Probability (%)</span>
+          </div>
+        </div>
+        <div class="relative h-64 w-full">
+          <canvas id="hourlyPrecipChart"></canvas>
+        </div>
+      </div>
+
+      <!-- 7-Day Forecast Grid -->
+      <div>
+        <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+          <i class="fa-regular fa-calendar-days text-sky-400"></i>
+          <span>7-Day Water & Precipitation Forecast</span>
+        </h3>
+        <div id="dailyForecastGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+          <!-- Populated by JS -->
+          <div class="glass-card p-4 text-center animate-pulse">
+            <div class="h-4 bg-slate-700 rounded mb-2"></div>
+            <div class="h-8 bg-slate-700 rounded mb-2"></div>
+            <div class="h-4 bg-slate-700 rounded"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Water Weather Advisory Card -->
+      <div class="glass-card p-5 border-l-4 border-l-sky-400 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold px-2 py-0.5 bg-sky-500/20 text-sky-300 rounded-md uppercase tracking-wider">Smart Hydro Advisory</span>
+            <span id="advisoryBadge" class="text-xs font-semibold px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-md">Optimal</span>
+          </div>
+          <p id="advisoryText" class="text-sm text-slate-200 font-medium">Checking weather conditions for personalized hydration advice...</p>
+        </div>
+        <button id="applyHydrationBoostBtn" class="btn-water px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap shadow-md">
+          <i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i> Sync Water Target with Weather
+        </button>
+      </div>
+
+    </section>
+
+    <!-- TAB 2: WATER APP / HYDRATION TRACKER -->
+    <section id="tab-hydration" class="tab-content hidden space-y-6">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left: Animated Water Tank / Glass -->
+        <div class="lg:col-span-5 glass-card p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+          
+          <div class="mb-4">
+            <span class="text-xs uppercase font-bold tracking-widest text-sky-400">Daily Water Progress</span>
+            <h3 id="hydrationPctText" class="text-4xl font-extrabold text-white mt-1">0%</h3>
+            <p class="text-xs text-slate-400 mt-0.5"><span id="intakeValue" class="text-sky-300 font-bold">0</span> / <span id="targetValue">2500</span> ml</p>
+          </div>
+
+          <!-- Glass Gauge with Wave -->
+          <div class="water-tank-container my-2">
+            <div id="waterTankInner" class="water-tank-inner">
+              <div class="water-wave"></div>
+            </div>
+            <!-- Glass reflection shine -->
+            <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none"></div>
+            <!-- Indicator text inside tank -->
+            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
+              <span id="tankRemaining" class="text-sm font-bold text-white drop-shadow-md">2500 ml to go</span>
+            </div>
+          </div>
+
+          <!-- Quick Goal Reset / Target Setting -->
+          <div class="flex items-center gap-3 mt-4 text-xs">
+            <button id="openTargetModalBtn" class="text-slate-400 hover:text-sky-300 transition-colors">
+              <i class="fa-solid fa-sliders mr-1"></i> Adjust Goal
+            </button>
+            <span class="text-slate-600">•</span>
+            <button id="resetTodayBtn" class="text-slate-400 hover:text-red-400 transition-colors">
+              <i class="fa-solid fa-rotate-left mr-1"></i> Reset Today
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Right: Fast Water Log Actions & Timeline -->
+        <div class="lg:col-span-7 space-y-6">
+          
+          <!-- Quick Log Controls -->
+          <div class="glass-card p-6">
+            <h4 class="text-base font-bold text-white mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-plus-circle text-sky-400"></i> Log Water Drink
+            </h4>
+
+            <div class="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-4">
+              <button class="btn-quick-add p-3 rounded-2xl flex flex-col items-center gap-1.5" data-amount="150">
+                <i class="fa-solid fa-mug-saucer text-sky-400 text-lg"></i>
+                <span class="text-sm font-bold text-white">+150 ml</span>
+                <span class="text-[10px] text-slate-400">Cup</span>
+              </button>
+              <button class="btn-quick-add p-3 rounded-2xl flex flex-col items-center gap-1.5" data-amount="250">
+                <i class="fa-solid fa-glass-water text-sky-400 text-lg"></i>
+                <span class="text-sm font-bold text-white">+250 ml</span>
+                <span class="text-[10px] text-slate-400">Glass</span>
+              </button>
+              <button class="btn-quick-add p-3 rounded-2xl flex flex-col items-center gap-1.5" data-amount="500">
+                <i class="fa-solid fa-bottle-water text-sky-400 text-lg"></i>
+                <span class="text-sm font-bold text-white">+500 ml</span>
+                <span class="text-[10px] text-slate-400">Bottle</span>
+              </button>
+              <button class="btn-quick-add p-3 rounded-2xl flex flex-col items-center gap-1.5 col-span-3 sm:col-span-1" data-amount="750">
+                <i class="fa-solid fa-flask text-sky-400 text-lg"></i>
+                <span class="text-sm font-bold text-white">+750 ml</span>
+                <span class="text-[10px] text-slate-400">Sports Flask</span>
+              </button>
+            </div>
+
+            <!-- Custom Amount Input -->
+            <form id="customLogForm" class="flex items-center gap-2">
+              <div class="relative flex-grow">
+                <input 
+                  type="number" 
+                  id="customAmountInput" 
+                  placeholder="Custom amount (e.g. 300)" 
+                  min="10" 
+                  max="5000"
+                  class="w-full pl-3 pr-10 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:border-sky-400"
+                  required
+                >
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-semibold">ml</span>
+              </div>
+              <button type="submit" class="btn-water px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2">
+                <i class="fa-solid fa-check"></i> Add
+              </button>
+            </form>
+          </div>
+
+          <!-- Today's Intake History -->
+          <div class="glass-card p-6">
+            <h4 class="text-base font-bold text-white mb-3 flex items-center justify-between">
+              <span class="flex items-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left text-sky-400"></i> Today's Water Timeline
+              </span>
+              <span id="logCountBadge" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">0 drinks</span>
+            </h4>
+
+            <div id="todayLogsList" class="space-y-2 max-h-56 overflow-y-auto pr-1">
+              <!-- Logs populated by JS -->
+              <p class="text-sm text-slate-400 italic py-4 text-center">No water logged yet today. Take a sip and track your first glass!</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- TAB 3: RAIN HARVEST & ECO ADVISOR -->
+    <section id="tab-harvest" class="tab-content hidden space-y-6">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Rain Harvesting Calculator -->
+        <div class="lg:col-span-7 glass-card p-6 space-y-5">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-cyan-400">Eco-Water Utility</span>
+            <h3 class="text-xl font-bold text-white mt-1 flex items-center gap-2">
+              <i class="fa-solid fa-cloud-arrow-down text-cyan-400"></i> Rainwater Harvesting Calculator
+            </h3>
+            <p class="text-xs text-slate-300 mt-1">Estimate how much pure rainwater you can harvest from forecasted rainfall for your home or garden.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5">Roof / Catchment Area (m²)</label>
+              <div class="relative">
+                <input type="number" id="roofAreaInput" value="120" min="10" max="5000" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-sky-400">
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">m²</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5">Expected Rainfall (mm)</label>
+              <div class="relative">
+                <input type="number" id="rainfallInput" value="25" min="1" max="1000" step="0.5" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-sky-400">
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">mm</span>
+              </div>
+              <button id="useForecastRainBtn" class="text-[11px] text-sky-400 hover:underline mt-1 block">
+                <i class="fa-solid fa-bolt mr-1"></i>Use this week's forecasted rain
+              </button>
+            </div>
+          </div>
+
+          <!-- Harvest Calculation Results Card -->
+          <div class="bg-gradient-to-br from-sky-950/60 to-slate-900/80 border border-sky-500/30 rounded-2xl p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-slate-300 font-medium">Estimated Harvest Yield:</span>
+              <span class="text-xs bg-sky-500/20 text-sky-300 px-2.5 py-0.5 rounded-full border border-sky-400/30 font-semibold">85% Runoff Efficiency</span>
+            </div>
+
+            <div class="flex items-baseline gap-2">
+              <span id="harvestLiters" class="text-4xl font-extrabold text-sky-300">2,550</span>
+              <span class="text-lg font-semibold text-slate-200">Liters</span>
+              <span id="harvestGallons" class="text-xs text-slate-400 ml-2">(~673 Gallons)</span>
+            </div>
+
+            <!-- Impact Equivalents -->
+            <div class="grid grid-cols-3 gap-2 pt-2 border-t border-white/10 text-center">
+              <div class="bg-slate-800/40 p-2 rounded-xl">
+                <i class="fa-solid fa-toilet text-cyan-400 text-sm mb-1"></i>
+                <span id="flushCount" class="block text-base font-bold text-white">425</span>
+                <span class="text-[10px] text-slate-400">Toilet Flushes</span>
+              </div>
+              <div class="bg-slate-800/40 p-2 rounded-xl">
+                <i class="fa-solid fa-shower text-sky-400 text-sm mb-1"></i>
+                <span id="showerMinutes" class="block text-base font-bold text-white">283</span>
+                <span class="text-[10px] text-slate-400">Shower Mins</span>
+              </div>
+              <div class="bg-slate-800/40 p-2 rounded-xl">
+                <i class="fa-solid fa-seedling text-emerald-400 text-sm mb-1"></i>
+                <span id="gardenDays" class="block text-base font-bold text-white">170</span>
+                <span class="text-[10px] text-slate-400">Garden Days</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Garden & Water Conservation Advisor -->
+        <div class="lg:col-span-5 space-y-4">
+          
+          <div class="glass-card p-6">
+            <h4 class="text-base font-bold text-white mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-plant-wilt text-emerald-400"></i> Smart Garden Irrigation
+            </h4>
+            <div id="gardenStatusBox" class="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-200 text-sm space-y-2">
+              <div class="font-bold flex items-center gap-2">
+                <i class="fa-solid fa-circle-check text-emerald-400"></i> Ready to water
+              </div>
+              <p id="gardenStatusText" class="text-xs text-slate-300">No heavy precipitation forecasted today. Water potted plants in the morning to retain soil moisture.</p>
+            </div>
+          </div>
+
+          <div class="glass-card p-6">
+            <h4 class="text-base font-bold text-white mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-lightbulb text-amber-400"></i> Quick Water Saving Tips
+            </h4>
+            <ul class="space-y-2.5 text-xs text-slate-300">
+              <li class="flex items-start gap-2">
+                <i class="fa-solid fa-droplet text-sky-400 mt-0.5"></i>
+                <span>Fix leaky faucets: A dripping tap can waste over 15 liters of water daily.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fa-solid fa-droplet text-sky-400 mt-0.5"></i>
+                <span>Use aerators on sink faucets to reduce water flow by up to 50% without losing pressure.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fa-solid fa-droplet text-sky-400 mt-0.5"></i>
+                <span>Collect vegetable wash water to nourish indoor houseplants.</span>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- TAB 4: WATER INSIGHTS & ANALYTICS -->
+    <section id="tab-analytics" class="tab-content hidden space-y-6">
+      
+      <div class="glass-card p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-chart-column text-sky-400"></i>
+              <span>7-Day Water Intake vs Daily Target</span>
+            </h3>
+            <p class="text-xs text-slate-400">Review your daily hydration consistency and streak over the past week</p>
+          </div>
+          <div class="flex items-center gap-4 text-xs">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 bg-sky-500 rounded-sm"></span>
+              <span class="text-slate-300">Intake (ml)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-0.5 bg-red-400 rounded-full"></span>
+              <span class="text-slate-300">Target (ml)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative h-64 w-full">
+          <canvas id="weeklyHydrationChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Stats Counters -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="glass-card p-5 text-center">
+          <span class="text-xs text-slate-400 uppercase font-bold tracking-wider">7-Day Total</span>
+          <h4 id="statWeeklyTotal" class="text-2xl font-extrabold text-sky-300 mt-1">0 L</h4>
+          <p class="text-[11px] text-slate-400 mt-0.5">Total fluid consumed</p>
+        </div>
+        <div class="glass-card p-5 text-center">
+          <span class="text-xs text-slate-400 uppercase font-bold tracking-wider">Daily Average</span>
+          <h4 id="statDailyAvg" class="text-2xl font-extrabold text-cyan-300 mt-1">0 ml</h4>
+          <p class="text-[11px] text-slate-400 mt-0.5">Average per day</p>
+        </div>
+        <div class="glass-card p-5 text-center">
+          <span class="text-xs text-slate-400 uppercase font-bold tracking-wider">Goal Completion Rate</span>
+          <h4 id="statGoalRate" class="text-2xl font-extrabold text-emerald-400 mt-1">0%</h4>
+          <p class="text-[11px] text-slate-400 mt-0.5">Days target met</p>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Target Setting Modal -->
+  <div id="targetModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="glass-card max-w-md w-full p-6 space-y-4 border border-sky-500/30">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-sliders text-sky-400"></i> Hydration Target Settings
+        </h3>
+        <button id="closeTargetModalBtn" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="targetForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Daily Target (ml)</label>
+          <input type="number" id="baseTargetInput" min="500" max="8000" step="50" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-sky-400" required>
+          <p class="text-[11px] text-slate-400 mt-1">Standard recommendation is 2,000 - 3,000 ml for adults.</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Body Weight (kg)</label>
+          <input type="number" id="weightInput" min="30" max="250" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-sky-400">
+          <p class="text-[11px] text-slate-400 mt-1">Rough rule of thumb: ~35ml of water per kg of body weight.</p>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button type="button" id="cancelTargetBtn" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300">Cancel</button>
+          <button type="submit" class="btn-water px-4 py-2 rounded-xl text-xs font-bold">Save Target</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-white/10 bg-slate-950/60 py-4 px-4 text-center text-xs text-slate-400">
+    <p>AquaCast 💧 • Powered by Open-Meteo & Node.js Express • Stay Hydrated & Conserve Water</p>
+  </footer>
+
+  <!-- App Script -->
+  <script src="js/app.js"></script>
+</body>
+</html>

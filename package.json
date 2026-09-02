@@ -1,0 +1,16 @@
+﻿{
+  "name": "aquacast-water-app",
+  "version": "1.0.0",
+  "description": "Simple and modern Water & Weather Forecast + Hydration Companion Web App in Node.js",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  },
+  "keywords": ["weather", "forecast", "water", "hydration", "rain-harvesting"],
+  "author": "Antigravity",
+  "license": "ISC"
+}

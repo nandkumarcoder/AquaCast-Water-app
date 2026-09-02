@@ -1,0 +1,18 @@
+{
+  "logs": [
+    {
+      "id": "1788347184423",
+      "date": "2026-09-02",
+      "time": "04:36 pm",
+      "timestamp": "2026-09-02T11:06:24.423Z",
+      "amount": 250,
+      "type": "Water",
+      "note": ""
+    }
+  ],
+  "settings": {
+    "baseTarget": 2500,
+    "unit": "ml",
+    "weight": 70
+  }
+}
